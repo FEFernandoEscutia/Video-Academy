@@ -3,8 +3,14 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Paleta de colores no del todo definida */
+  --background: #28262c;
+  --principal-text: #f9f5ff;
+  --secondary-text: #000100;
+  --primary: #998fc7;
+  --secondary: #d4c2fc;
+  --accent-color: #731DD8;
+  --foreground: #D9D9D9;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -14,11 +20,42 @@
   }
 }
 
+/* Estilos globales de los botones */
+.primary-btn {
+  background-color: var(--background);
+  color: var(--principal-text);
+  border-radius: 12px;
+  padding: 0.8rem 2rem;
+  font-size: 1rem;
+}
+
+.primary-btn:hover {
+  background-color: var(--primary);
+  transition: all 0.5s ease;
+  color: var(--principal-text);
+}
+
+.secondary-btn:hover {
+  background-color: var(--accent-color);
+  transition: all 0.5s ease;
+  color: var(--principal-text);
+}
+
+.secondary-btn {
+  background-color: var(--foreground);
+  color: var(--secondary-text);
+  border-radius: 12px;
+  padding: 0.8rem 2rem;
+  font-size: 1rem;
+}
+
 body {
-  color: var(--foreground);
-  background: var(--background);
+  /* color: var(--foreground);
+  background: var(--background); */
   font-family: Arial, Helvetica, sans-serif;
 }
+
+
 
 @layer utilities {
   .text-balance {

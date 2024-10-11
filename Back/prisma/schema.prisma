@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum SubscriptionType {
+  ACTIVE 
+  INACTIVE
+}
+
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  password     String
+  name         String
+  image        String?       @default("")
+  role         Role          @default(USER) // Enum para tipo de usuario.
+  videos       Video[]       @relation("PurchasedVideos") // Relación muchos a muchos: un usuario puede comprar muchos videos, y un video puede ser comprado por muchos usuarios.
+  orders       Order[]       // Relación uno a muchos: un usuario puede tener muchas órdenes.
+  reviews      Review[]      // Relación uno a muchos: un usuario puede hacer muchas reseñas.
+  subscription Subscription? // Relación uno a uno: un usuario puede tener una única suscripción.
+}
+
+model Video {
+  id           String        @id @default(uuid())
+  title        String
+  description  String
+  url          String
+  users        User[]        @relation("PurchasedVideos") // Relación muchos a muchos: un video puede ser comprado por muchos usuarios, y un usuario puede comprar muchos videos.
+  reviews      Review[]      // Relación uno a muchos: un video puede tener muchas reseñas.
+  orderDetails OrderDetail[] // Relación uno a muchos: un video puede estar en muchos detalles de órdenes.
+}
+
+model Order {
+  id        String       @id @default(uuid())
+  user      User         @relation(fields: [userId], references: [id]) // Relación muchos a uno: muchas órdenes pueden pertenecer a un solo usuario.
+  userId    String       // Este campo almacena el ID del usuario.  Prisma necesita saber a qué usuario está vinculada cada orden.
+  details   OrderDetail? // Relación uno a uno: una orden puede tener solo un detalle de orden.
+  detailsId String       @unique // Este campo asegura que cada orden tiene un único detalle.
+  createdAt DateTime     @default(now())
+}
+
+model OrderDetail {
+  id       String  @id @default(uuid())
+  order    Order   @relation(fields: [orderId], references: [id]) // Relación uno a uno: un detalle de orden pertenece a una sola orden.
+  orderId  String  @unique // Este campo almacena el ID de la orden a la que pertenece el detalle. En Prisma, es necesario para gestionar la relación y almacenar la clave foránea que conecta esta entidad con la orden.
+  video    Video  @relation(fields: [videoId], references: [id]) // Relación muchos a uno: muchos detalles de órdenes pueden referirse a un solo video.
+  videoId  String // Almacena el ID del video. Prisma lo usa para gestionar la relación.
+  quantity Int
+  price    Float //numeros con decimales
+}
+
+model Review {
+  id      String @id @default(uuid())
+  content String
+  video   Video  @relation(fields: [videoId], references: [id]) // Relación muchos a uno: muchas reseñas pueden estar relacionadas con un solo video.
+  videoId String // Este campo almacena el ID del video asociado a la reseña. En Prisma, este campo es necesario para gestionar la relación con la tabla de videos, almacenando el ID como clave foránea.
+  user    User   @relation(fields: [userId], references: [id]) // Relación muchos a uno: muchas reseñas pueden pertenecer a un solo usuario.
+  userId  String // Este campo almacena el ID del usuario que escribió la reseña. Prisma lo usa para gestionar la relación y almacenar el ID en la tabla de reseñas.
+}
+
+model Subscription {
+  id        String           @id @default(uuid())
+  type      SubscriptionType // Enum para tipo de suscripción.
+  user      User             @relation(fields: [userId], references: [id]) // Relación uno a uno: una suscripción pertenece a un solo usuario.
+  userId    String           @unique // Este campo almacena el ID del usuario que tiene la suscripción. En Prisma, se utiliza para vincular la suscripción con el usuario correspondiente.
+  startDate DateTime
+  endDate   DateTime
+}
+

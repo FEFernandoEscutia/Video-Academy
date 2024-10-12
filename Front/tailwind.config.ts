@@ -10,10 +10,16 @@ const config: Config = {
     extend: {
       colors: {
         background: "var(--background)",
+        'principal-text': "var(--principal-text)",
+        'secondary-text': "var(--secondary-text)",
+        primary: "var(--primary)",
+        secondary: "var(--secondary)",
+        'accent-color': "var(--accent-color)",
         foreground: "var(--foreground)",
       },
     },
   },
   plugins: [],
 };
+
 export default config;

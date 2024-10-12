@@ -13,42 +13,42 @@
   --foreground: #d9d9d9;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #28262c;
-    --principal-text: #f9f5ff;
-    --secondary-text: #000100;
-    --primary: #998fc7;
-    --secondary: #d4c2fc;
-    --accent-color: #731dd8;
-    --foreground: #d9d9d9;
-  }
+/* global.css */
+.isActive {
+  background-color: var(--foreground); /* Fondo blanco */
+  color: black; /* Texto negro */
+  border-radius: 0.75rem; /* Equivalente a rounded en Tailwind */
+}
+
+/* Ajustes para Link */
+a {
+  text-decoration: none; /* Opcional: elimina el subrayado en los enlaces */
 }
 
 /* Estilos globales de los botones */
 .primary-btn {
   background-color: var(--background);
   color: var(--principal-text);
-  border-radius: 12px;
+  border-radius: 0.75rem;
   font-size: 1rem;
 }
 
 .primary-btn:hover {
   background-color: var(--primary);
-  transition: all 0.5s ease;
-  color: var(--principal-text);
+  transition: all 0.1s ease;
+  color: var(--secondary-text);
 }
 
 .secondary-btn:hover {
   background-color: var(--accent-color);
-  transition: all 0.5s ease;
+  transition: all 0.1s ease;
   color: var(--principal-text);
 }
 
 .secondary-btn {
   background-color: var(--foreground);
   color: var(--secondary-text);
-  border-radius: 12px;
+  border-radius: 0.75rem;
   font-size: 1rem;
 }
 

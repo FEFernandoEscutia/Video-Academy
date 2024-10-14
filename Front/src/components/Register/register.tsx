@@ -33,19 +33,19 @@ const Register: React.FC = () => {
         <form onSubmit={handleRegister} className="w-full max-w-sm bg-white shadow-md rounded px-8 py-6">
             <h2 className="text-2xl font-bold text-center text-[var(--primary)]">Register</h2>
             <div className="mb-4">
-            <label htmlFor="name" className="block text-[var(--principal-text)] text-sm font-bold mb-2">Nombre</label>
+            <label htmlFor="name" className="block text-[black] text-sm font-bold mb-2">Nombre</label>
             <input type="text" id="name" value={name} onChange={(e) => setName(e.target.value)} required className="w-full px-3 py-2 border rounded" />
             </div>
             <div className="mb-4">
-            <label htmlFor="email" className="block text-[var(--principal-text)] text-sm font-bold mb-2">Email</label>
+            <label htmlFor="email" className="block text-[black] text-sm font-bold mb-2">Email</label>
             <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full px-3 py-2 border rounded" />
             </div>
             <div className="mb-4">
-            <label htmlFor="password" className="block text-[var(--principal-text)] text-sm font-bold mb-2">Contraseña</label>
+            <label htmlFor="password" className="block text-[black] text-sm font-bold mb-2">Contraseña</label>
             <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="w-full px-3 py-2 border rounded" />
             </div>
             <div className="mb-4">
-            <label htmlFor="confirmPassword" className="block text-[var(--principal-text)] text-sm font-bold mb-2">Confirmar Contraseña</label>
+            <label htmlFor="confirmPassword" className="block text-[black] text-sm font-bold mb-2">Confirmar Contraseña</label>
             <input type="password" id="confirmPassword" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required className="w-full px-3 py-2 border rounded" />
             </div>
             {error && <p className="text-red-500 text-xs italic">{error}</p>}

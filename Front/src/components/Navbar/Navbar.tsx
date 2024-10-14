@@ -1,12 +1,17 @@
 // components/Navbar.tsx
 import ActiveLink from "@/helpers/activeLink";
+import Link from "next/link";
 
 const Navbar = () => {
   return (
     <nav className="bg-[var(--background)] text-[var(--principal-text)] h-20 flex justify-between items-center px-4">
       {/* logo */}
       <div>
-        <h1 className="text-3xl font-bold text-[var(--primary)]">ConsoLearn</h1>
+      <Link href="/">
+          <h1 className="text-3xl font-bold text-[var(--primary)]">
+            ConsoLearn
+          </h1>
+        </Link>
       </div>
 
       {/* menu */}

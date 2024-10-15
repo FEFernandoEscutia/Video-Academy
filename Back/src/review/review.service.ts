@@ -1,9 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
+import { PrismaClient } from '@prisma/client';
 
 @Injectable()
-export class ReviewService {
+export  class ReviewService extends PrismaClient implements OnModuleInit {
+  private readonly logger = new Logger('Review Service');
+  onModuleInit() {
+    this.$connect();
+    this.logger.log('Database Connected');
+  }
   create(createReviewDto: CreateReviewDto) {
     return 'This action adds a new review';
   }

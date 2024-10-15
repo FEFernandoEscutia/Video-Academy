@@ -1,9 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
+import { PrismaClient } from '@prisma/client';
 
 @Injectable()
-export class SubscriptionService {
+export  class SubscriptionService extends PrismaClient implements OnModuleInit {
+  private readonly logger = new Logger('Subscription Service');
+  onModuleInit() {
+    this.$connect();
+    this.logger.log('Database Connected');
+  }
   create(createSubscriptionDto: CreateSubscriptionDto) {
     return 'This action adds a new subscription';
   }

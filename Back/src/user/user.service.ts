@@ -4,7 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaClient } from '@prisma/client';
 
 @Injectable()
-export  class UserService extends PrismaClient implements OnModuleInit {
+export class UserService extends PrismaClient implements OnModuleInit {
   private readonly logger = new Logger('User Service');
   onModuleInit() {
     this.$connect();
@@ -15,7 +15,7 @@ export  class UserService extends PrismaClient implements OnModuleInit {
   }
 
   findAll() {
-    return `This action returns all user`;
+    return this.user.findFirst({});
   }
 
   findOne(id: number) {

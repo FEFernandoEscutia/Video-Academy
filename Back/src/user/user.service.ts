@@ -15,7 +15,7 @@ export class UserService extends PrismaClient implements OnModuleInit {
   }
 
   findAll() {
-    return this.user.findFirst({});
+    return this.user.findMany({});
   }
 
   findOne(id: number) {

@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 
-import { UserModule } from './user/user.module';
-import { VideoModule } from './video/video.module';
-import { CourseModule } from './course/course.module';
-import { OrderModule } from './order/order.module';
-import { ReviewModule } from './review/review.module';
-import { SubscriptionModule } from './subscription/subscription.module';
+import { UserModule } from './modules/user/user.module';
+import { VideoModule } from './modules/video/video.module';
+import { CourseModule } from './modules/course/course.module';
+import { OrderModule } from './modules/order/order.module';
+import { ReviewModule } from './modules/review/review.module';
+import { SubscriptionModule } from './modules/subscription/subscription.module';
 
 
 @Module({

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   Logger,
@@ -13,7 +14,7 @@ import { envs } from 'src/config';
 @Injectable()
 export class UserService extends PrismaClient implements OnModuleInit {
   private readonly logger = new Logger('User Service');
- //****************************************************************************************************
+  //****************************************************************************************************
   async onModuleInit() {
     this.$connect();
     this.logger.log('Database Connected');
@@ -22,21 +23,21 @@ export class UserService extends PrismaClient implements OnModuleInit {
       email: envs.Admin0Email,
       password: envs.Admin0Password,
       phone: envs.Admin0phone,
-      role:Role.ADMIN
+      role: Role.ADMIN,
     };
     const dbUser = await this.user.findFirst({
       where: { email: aUser0.email },
     });
-    if(dbUser){
-      return this.logger.log("Admin0 was found")
+    if (dbUser) {
+      return this.logger.log('Admin0 was found');
     }
     await this.create(aUser0);
     this.logger.log('Admin0 was created successfully');
   }
 
-   //****************************************************************************************************
+  //****************************************************************************************************
   async create(createUserDto: CreateUserDto) {
-    const { password, ...rData } = createUserDto;
+    const { password, role, ...rData } = createUserDto;
     const dbUser = await this.user.findFirst({
       where: {
         OR: [{ phone: createUserDto.phone }, { email: createUserDto.email }],
@@ -48,30 +49,62 @@ export class UserService extends PrismaClient implements OnModuleInit {
       );
     }
     const hashPassword = await bcrypt.hash(createUserDto.password, 10);
-    return this.user.create({ data: { ...rData, password: hashPassword } });
+    return this.user.create({
+      data: { ...rData, password: hashPassword, role: Role.USER },
+    });
   }
 
-   //****************************************************************************************************
+  //****************************************************************************************************
 
   findAll() {
     return this.user.findMany({});
   }
 
-   //****************************************************************************************************
+  //****************************************************************************************************
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOneWEmail(email: string) {
+    return await this.user.findFirst({ where: { email: email } });
   }
 
-   //****************************************************************************************************
+  //****************************************************************************************************
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async findOne(id: string) {
+    const dbUser = await this.user.findFirst({ where: { id } });
+    if (!dbUser) {
+      throw new BadRequestException('Wrong id was provided, please verify');
+    }
+    return dbUser;
   }
 
-   //****************************************************************************************************
+  //****************************************************************************************************
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    const dbUser = await this.findOne(id);
+    if (!dbUser) {
+      throw new BadRequestException('user does not exist');
+    }
+    const wrongRequest = await this.user.findFirst({
+      where: {
+        OR: [{ phone: updateUserDto.phone }, { email: updateUserDto.email }],
+      },
+    });
+    if (wrongRequest) {
+      throw new BadRequestException('Email or phone number already exist');
+    }
+    await this.user.update({ where: { id }, data: { ...updateUserDto } });
+    return { message: 'User has been updated correctly, please log back in' };
+  }
+
+  //****************************************************************************************************
+
+  async remove(id: string) {
+    const userDb = await this.findOne(id) 
+    if(!userDb){
+      throw new BadRequestException("User does not exist")
+    }
+    await this.user.delete({where:{
+      id
+    }})
+    return { message:"User has been deleted"}
   }
 }

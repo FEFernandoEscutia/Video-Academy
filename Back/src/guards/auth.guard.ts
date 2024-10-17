@@ -27,10 +27,6 @@ import { envs } from 'src/config';
         request.user = payload;
         return true;
       } catch (error) {
-        const secret = envs.jwtSecret;
-        const payload = await this.jwtService.verifyAsync(token, { secret });
-        console.log(payload);
-        console.log('Error verifying token:', error.message);
         throw new UnauthorizedException('Invalid Token');
       }
     }

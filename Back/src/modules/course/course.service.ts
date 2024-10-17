@@ -1,32 +1,66 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
-import { PrismaClient } from '@prisma/client';
+import { Course, PrismaClient } from '@prisma/client';
 
 @Injectable()
 export  class CourseService extends PrismaClient implements OnModuleInit{
+
   private readonly logger = new Logger('Course Service');
   onModuleInit() {
     this.$connect();
     this.logger.log('Database Connected');
   }
-  create(createCourseDto: CreateCourseDto) {
-    return 'This action adds a new course';
+  async create(createCourseDto: CreateCourseDto):Promise<CreateCourseDto>{
+    return await this.course.create({ data: createCourseDto });
   }
 
-  findAll() {
-    return `This action returns all course`;
+  async findAll():Promise<Course[]> {
+    return await this.course.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} course`;
+  async findCourseAvailable():Promise<Course[]> {
+    return await  this.course.findMany({
+      where:{
+        available: true
+      }
+    })
   }
 
-  update(id: number, updateCourseDto: UpdateCourseDto) {
-    return `This action updates a #${id} course`;
+  async findOne(id: string):Promise<CreateCourseDto> {
+    return await this.course.findFirst({
+      where: {
+        id:id
+      }
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} course`;
+  async update(id: string, updateCourseDto: UpdateCourseDto):Promise<UpdateCourseDto> {
+
+    const courseByID =  this.course.findFirst({ where: {id} })
+
+    if (!courseByID) {
+      throw new Error('Course not found'); // Manejo de errores si no se encuentra el curso
+    }
+    return await this.course.update({
+      where: {id},
+      data : updateCourseDto
+      });
   }
+
+  async remove(id: string):Promise<String> {
+    const  courseId = this.course.findFirst({ where: {id}})
+  
+    if (!courseId) {
+      throw new Error('Course not found'); // Manejo de errores si no se encuentra el curso
+    }
+  
+    // Elimina el curso
+    await this.course.delete({
+      where: { id },
+    });
+  
+    return `El curso con ID ${id} ha sido eliminado exitosamente.`;
+};
+
 }

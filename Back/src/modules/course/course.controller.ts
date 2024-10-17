@@ -8,8 +8,8 @@ export class CourseController {
   constructor(private readonly courseService: CourseService) {}
 
   @Post()
-  create(@Body() createCourseDto: CreateCourseDto) {
-    return this.courseService.create(createCourseDto);
+  async create(@Body() createCourseDto: CreateCourseDto) {
+    return await  this.courseService.create(createCourseDto);
   }
 
   @Get()
@@ -17,18 +17,23 @@ export class CourseController {
     return this.courseService.findAll();
   }
 
+  @Get('/available')
+  async findCourseAvailable(){
+    return await this.courseService.findCourseAvailable();
+  }
+
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.courseService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    return await this.courseService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateCourseDto: UpdateCourseDto) {
-    return this.courseService.update(+id, updateCourseDto);
+    return this.courseService.update(id, updateCourseDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.courseService.remove(+id);
+    return this.courseService.remove(id);
   }
 }

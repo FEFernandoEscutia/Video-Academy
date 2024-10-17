@@ -23,16 +23,21 @@ export  class CourseService extends PrismaClient implements OnModuleInit{
     return await  this.course.findMany({
       where:{
         available: true
+      },
+      include:{
+        reviews:{
+          select:{
+            id:true,
+            content:true,
+            rating:true,
+          }
+        }
       }
     })
   }
 
   async findOne(id: string):Promise<CreateCourseDto> {
-    return await this.course.findFirst({
-      where: {
-        id:id
-      }
-    });
+    return await this.course.findFirst({ where:{id}});
   }
 
   async update(id: string, updateCourseDto: UpdateCourseDto):Promise<UpdateCourseDto> {

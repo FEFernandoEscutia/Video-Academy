@@ -7,6 +7,7 @@ interface EnvVars {
   ADMIN0_PASSWORD: string;
   ADMIN0_EMAIL: string;
   ADMIN0_PHONE: string;
+  JWT_SECRET:string
 }
 
 const envSchema = joi
@@ -16,6 +17,7 @@ const envSchema = joi
     ADMIN0_PASSWORD: joi.string().required(),
     ADMIN0_EMAIL: joi.string().required(),
     ADMIN0_PHONE: joi.string().required(),
+    JWT_SECRET: joi.string().required()
   })
   .unknown(true);
 
@@ -33,4 +35,5 @@ export const envs = {
   Admin0Password: envVars.ADMIN0_PASSWORD,
   Admin0Email: envVars.ADMIN0_EMAIL,
   Admin0phone: envVars.ADMIN0_PHONE,
+  jwtSecret: envVars.JWT_SECRET
 };

@@ -19,13 +19,9 @@ export  class CourseService extends PrismaClient implements OnModuleInit{
     return await this.course.findMany();
   }
 
-  // async findCourseAvailable():Promise<Course[]> {
-  //   return await  this.course.findMany({
-  //     where:{
-  //       available: true
-  //     }
-  //   })
-  // }
+  async findCourseAvailable():Promise<Course[]> {
+    return await  this.course.findMany()
+  }
 
   async findOne(id: string):Promise<CreateCourseDto> {
     return await this.course.findFirst({

@@ -21,20 +21,7 @@ export  class CourseService extends PrismaClient implements OnModuleInit{
   }
 
   async findCourseAvailable():Promise<Course[]> {
-    return await  this.course.findMany({
-      where:{
-        available: true
-      },
-      include:{
-        reviews:{
-          select:{
-            id:true,
-            content:true,
-            rating:true,
-          }
-        }
-      }
-    })
+    return await  this.course.findMany()
   }
 
 
@@ -48,7 +35,11 @@ export  class CourseService extends PrismaClient implements OnModuleInit{
 
 
   async findOne(id: string):Promise<CreateCourseDto> {
-    return await this.course.findFirst({ where:{id}});
+    return await this.course.findFirst({
+      where: {
+        id:id
+      }
+    });
   }
 
   async update(id: string, updateCourseDto: UpdateCourseDto):Promise<UpdateCourseDto> {

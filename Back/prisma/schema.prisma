@@ -5,7 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
@@ -53,6 +54,7 @@ model Course {
   thumbnail    String        @default("")
   technologies String[]
   price        Float
+  isAvailable Boolean  @default(true)
   orderDetails OrderDetail[]
   reviews      Review[]
   users        User[]        @relation("PurchasedCourses") // Relación muchos a muchos: un curso puede ser comprado por muchos usuarios.

@@ -1,23 +1,23 @@
-# Use Node.js as base image
+# Usa Node.js como imagen base
 FROM node:18
 
-# Set working directory
+# Establece el directorio de trabajo dentro del contenedor
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Copia los archivos package.json y package-lock.json
 COPY package*.json ./
 
-# Install dependencies
+# Instala las dependencias
 RUN npm install
 
-# Copy the rest of the application files
+# Copia el resto de los archivos de la aplicación
 COPY . .
 
-# Install Prisma client and generate Prisma files
+# Instala el cliente de Prisma y genera los archivos necesarios
 RUN npx prisma generate
 
-# Expose the app on port 3000
+# Expone la aplicación en el puerto 3000
 EXPOSE 3000
 
-# Start the application
+# Comando para iniciar la aplicación
 CMD ["npm", "run", "start:dev"]

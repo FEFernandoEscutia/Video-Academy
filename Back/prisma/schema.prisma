@@ -5,7 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
@@ -18,43 +19,45 @@ enum Role {
   ADMIN
 }
 
-enum SubscriptionType {
-  ACTIVE
-  INACTIVE
-}
+// enum SubscriptionType {
+//   ACTIVE
+//   INACTIVE
+// }
 
 model User {
   id           String        @id @default(uuid())
   email        String        @unique
   password     String
   name         String
-  image        String?       @default("")
+  phone        String        @unique
+  image        String?       @default("https://img.freepik.com/vector-premium/icono-perfil-avatar-predeterminado-imagen-usuario-redes-sociales-icono-avatar-gris-silueta-perfil-blanco-ilustracion-vectorial_561158-3407.jpg?w=740")
   role         Role          @default(USER)
   courses      Course[]      @relation("PurchasedCourses") // Relación muchos a muchos: un usuario puede comprar muchos cursos.
   orders       Order[]
   reviews      Review[]
-  subscription Subscription?
+  // subscription Subscription?
 }
 
 model Video {
-  id           String        @id @default(uuid())
-  title        String
-  description  String
-  url          String
-  course       Course        @relation(fields: [courseId], references: [id]) // Relación muchos a uno: un video pertenece a un curso.
-  courseId     String // Este campo almacena el ID del curso al que pertenece el video.  
-  orderDetails OrderDetail[]
+  id          String @id @default(uuid())
+  title       String
+  description String
+  url         String
+  course      Course @relation(fields: [courseId], references: [id]) // Relación muchos a uno: un video pertenece a un curso.
+  courseId    String // Este campo almacena el ID del curso al que pertenece el video.  
 }
 
 model Course {
-  id           String   @id @default(uuid())
+  id           String        @id @default(uuid())
   title        String
   description  String
+  thumbnail    String        @default("")
   technologies String[]
   price        Float
+  isAvailable Boolean  @default(true)
+  orderDetails OrderDetail[]
   reviews      Review[]
-  available    Boolean  @default(true) // Indica si el curso está disponible para acceso según la suscripción.
-  users        User[]   @relation("PurchasedCourses") // Relación muchos a muchos: un curso puede ser comprado por muchos usuarios.
+  users        User[]        @relation("PurchasedCourses") // Relación muchos a muchos: un curso puede ser comprado por muchos usuarios.
   videos       Video[] // Relación uno a muchos: un curso puede tener muchos videos.
 }
 
@@ -67,14 +70,18 @@ model Order {
   createdAt DateTime     @default(now())
 }
 
+//En la orden se puede comprar ya sea un curso o una subscripcion
+
 model OrderDetail {
-  id       String @id @default(uuid())
-  order    Order  @relation(fields: [orderId], references: [id]) // Relación uno a uno: un detalle de orden pertenece a una sola orden.
-  orderId  String @unique // Este campo almacena el ID de la orden a la que pertenece el detalle. En Prisma, es necesario para gestionar la relación y almacenar la clave foránea que conecta esta entidad con la orden.
-  video    Video  @relation(fields: [videoId], references: [id]) // Relación muchos a uno: muchos detalles de órdenes pueden referirse a un solo video.
-  videoId  String // Almacena el ID del video. Prisma lo usa para gestionar la relación.
-  quantity Int
-  price    Float //numeros con decimales
+  id             String       @id @default(uuid())
+  order          Order        @relation(fields: [orderId], references: [id]) // Relación uno a uno: un detalle de orden pertenece a una sola orden.
+  orderId        String       @unique // Este campo almacena el ID de la orden a la que pertenece el detalle. En Prisma, es necesario para gestionar la relación y almacenar la clave foránea que conecta esta entidad con la orden.
+  course         Course?      @relation(fields: [courseId], references: [id]) // Relación muchos a uno: muchos detalles de órdenes pueden referirse a un solo video.
+  courseId       String // Almacena el ID del video. Prisma lo usa para gestionar la relación.
+  // subscription   Subscription? @relation(fields: [subscriptionId], references: [id]) 
+  // subscriptionId String
+  quantity       Int
+  price          Float //numeros con decimales
 }
 
 model Review {
@@ -87,11 +94,12 @@ model Review {
   userId   String // Este campo almacena el ID del usuario que escribió la reseña. Prisma lo usa para gestionar la relación y almacenar el ID en la tabla de reseñas.
 }
 
-model Subscription {
-  id        String           @id @default(uuid())
-  type      SubscriptionType // Enum para tipo de suscripción.
-  user      User             @relation(fields: [userId], references: [id]) // Relación uno a uno: una suscripción pertenece a un solo usuario.
-  userId    String           @unique // Este campo almacena el ID del usuario que tiene la suscripción. En Prisma, se utiliza para vincular la suscripción con el usuario correspondiente.
-  startDate DateTime
-  endDate   DateTime
-}
+// model Subscription {
+//   id          String           @id @default(uuid())
+//   type        SubscriptionType // Enum para tipo de suscripción.
+//   user        User             @relation(fields: [userId], references: [id]) // Relación uno a uno: una suscripción pertenece a un solo usuario.
+//   userId      String           @unique // Este campo almacena el ID del usuario que tiene la suscripción. En Prisma, se utiliza para vincular la suscripción con el usuario correspondiente.
+//   startDate   DateTime
+//   endDate     DateTime
+//   OrderDetail OrderDetail[]
+// }

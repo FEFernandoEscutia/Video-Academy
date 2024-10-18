@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, ForbiddenException } from '@nestjs/common';
 import { CourseService } from './course.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
@@ -11,26 +11,27 @@ export class CourseController {
   constructor(private readonly courseService: CourseService) {}
   //****************************************************************************************************
   @Post()
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  // @UseGuards(AuthGuard, RolesGuard)
+  // @Roles(Role.ADMIN)
   async create(@Body() createCourseDto: CreateCourseDto) {
     return await  this.courseService.create(createCourseDto);
   }
   //****************************************************************************************************
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+
   @Get()
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
-  findAll() {
-    return this.courseService.findAll();
+  @Roles(Role.ADMIN, Role.USER)
+  async findAll(@Req() req: any) {
+    const user = req.user;
+  
+    if (user.role === Role.ADMIN) {
+  
+      return this.courseService.findAll();
+    } else if (user.role === Role.USER) {
+     
+      return this.courseService.findCourseAvailable();
+    }
   }
-
-  // @Get('/available')
-  // async findCourseAvailable(){
-  //   return await this.courseService.findCourseAvailable();
-  // }
-
   //****************************************************************************************************
   @Get('/available')
   async findCourseAvailable(){
@@ -48,12 +49,38 @@ export class CourseController {
   }
   //****************************************************************************************************
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCourseDto: UpdateCourseDto) {
-    return this.courseService.update(id, updateCourseDto);
+@UseGuards(AuthGuard, RolesGuard)
+@Roles(Role.ADMIN)
+async update(@Param('id') id: string, @Body() updateCourseDto: UpdateCourseDto, @Req() req: any) {
+  const user = req.user;
+
+
+  if (user.role !== Role.ADMIN) {
+    throw new ForbiddenException('No tienes permiso para modificar este curso.');
   }
+
+  return this.courseService.update(id, updateCourseDto);
+}
+
   //****************************************************************************************************
+
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async remove(@Param('id') id: string, @Req() req: any) {
+    const user = req.user;
+  
+   
+    if (user.role !== Role.ADMIN) {
+      throw new ForbiddenException('No tienes permiso para eliminar este curso.');
+    }
+  
     return this.courseService.remove(id);
   }
+  
+
+
+
+
+
 }

@@ -53,6 +53,7 @@ model Course {
   thumbnail    String        @default("")
   technologies String[]
   price        Float
+  isAvailable Boolean  @default(true)
   orderDetails OrderDetail[]
   reviews      Review[]
   users        User[]        @relation("PurchasedCourses") // Relación muchos a muchos: un curso puede ser comprado por muchos usuarios.

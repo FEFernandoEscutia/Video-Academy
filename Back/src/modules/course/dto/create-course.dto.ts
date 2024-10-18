@@ -1,4 +1,3 @@
-
 import { IsString, IsNotEmpty, IsArray, IsNumber, Min, Max, MinLength, MaxLength, ArrayNotEmpty, IsPositive } from 'class-validator';
 
 export class CreateCourseDto {

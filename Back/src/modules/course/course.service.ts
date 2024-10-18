@@ -17,11 +17,21 @@ export  class CourseService extends PrismaClient implements OnModuleInit{
   }
 
   async findAll():Promise<Course[]> {
-    return await this.course.findMany();
+    return await this.course.findMany({
+      include:{
+        reviews:true
+      }
+    });
   }
-
-  async findCourseAvailable():Promise<Course[]> {
-    return await  this.course.findMany()
+  async findCourseAvailable(): Promise<Course[]> {
+    return await this.course.findMany({
+      where: {
+        isAvailable: true,
+      },
+      include: {
+        reviews: true, 
+      },
+    });
   }
 
 

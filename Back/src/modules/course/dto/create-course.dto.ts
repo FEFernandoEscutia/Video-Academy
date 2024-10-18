@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsArray, IsNumber, Min, Max, MinLength, MaxLength, ArrayNotEmpty, IsPositive, IsUrl } from 'class-validator';
+import { IsString, IsNotEmpty, IsArray, IsNumber, Min, Max, MinLength, MaxLength, ArrayNotEmpty, IsPositive } from 'class-validator';
 
 export class CreateCourseDto {
   @IsString()
@@ -23,8 +23,4 @@ export class CreateCourseDto {
   @Min(0, { message: 'El precio mínimo es 0.' })
   @Max(10000, { message: 'El precio máximo es 10,000.' })
   price: number;
-
-  @IsString()
-  @IsUrl({}, { message: 'El thumbnail debe ser una URL válida.' })
-  thumbnail?: string;
 }

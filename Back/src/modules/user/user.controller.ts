@@ -21,19 +21,19 @@ import * as bcrypt from 'bcryptjs';
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
+//*************************************************************************************
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
-
+//*************************************************************************************
   @Get()
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   findAll() {
     return this.userService.findAll();
   }
-
+//*************************************************************************************
   @Get(':id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
@@ -48,7 +48,7 @@ export class UserController {
       return this.userService.findOne(userDb.id);
     }
   }
-
+//*************************************************************************************
   @Patch(':id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
@@ -73,7 +73,7 @@ export class UserController {
       });
     }
   }
-
+//*************************************************************************************
   @Delete(':id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)

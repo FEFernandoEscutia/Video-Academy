@@ -5,6 +5,7 @@ import { Course, PrismaClient } from '@prisma/client';
 
 @Injectable()
 export  class CourseService extends PrismaClient implements OnModuleInit{
+ 
 
   private readonly logger = new Logger('Course Service');
   onModuleInit() {
@@ -22,6 +23,16 @@ export  class CourseService extends PrismaClient implements OnModuleInit{
   async findCourseAvailable():Promise<Course[]> {
     return await  this.course.findMany()
   }
+
+
+  async findCoursePopular():Promise<Course[]> {
+     
+    return await this.course.findMany({ orderBy:{
+      
+    }})
+    
+  }
+
 
   async findOne(id: string):Promise<CreateCourseDto> {
     return await this.course.findFirst({

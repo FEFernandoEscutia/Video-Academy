@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 import { IsString, IsNotEmpty, IsArray, IsNumber, Min, Max, MinLength, MaxLength, ArrayNotEmpty, IsPositive } from 'class-validator';
 
 export class CreateCourseDto {
@@ -24,30 +24,4 @@ export class CreateCourseDto {
   @Min(0, { message: 'El precio mínimo es 0.' })
   @Max(10000, { message: 'El precio máximo es 10,000.' })
   price: number;
-=======
-import { IsArray, IsBoolean, IsDecimal, IsNotEmpty, IsString } from "class-validator";
-
-export class CreateCourseDto {
-
-    @IsNotEmpty()
-    @IsString()
-    title: string;
-
-    @IsNotEmpty()
-    @IsString()
-    description: string;
-
-    @IsNotEmpty()
-    @IsArray()
-    @IsString({ each: true }) 
-    technologies: string[];
-
-    @IsNotEmpty()
-    @IsDecimal({ decimal_digits: '2', force_decimal: true })
-    price: number;
-
-    @IsNotEmpty()
-    @IsBoolean()
-    available?: boolean;
->>>>>>> b2ed5ce89ba03e1197926a600660adde149ac6ef
 }

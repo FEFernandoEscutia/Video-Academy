@@ -2,9 +2,11 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { Course, PrismaClient } from '@prisma/client';
+import { CourseFilterDto } from './dto/filter-course.dto';
 
 @Injectable()
 export  class CourseService extends PrismaClient implements OnModuleInit{
+ 
  
 
   private readonly logger = new Logger('Course Service');
@@ -41,6 +43,32 @@ export  class CourseService extends PrismaClient implements OnModuleInit{
       
     }})
     
+  }
+
+  async filterCourse(filterDto:CourseFilterDto) {
+
+    const {technologies,priceMin,priceMax}= filterDto
+    const where: any = { isAvailable: true };
+    
+    if (technologies && technologies.length > 0) {
+      where.technologies = { hasSome: technologies };
+    }
+
+    if (priceMin !== undefined || priceMax !== undefined) {
+      where.price = {};
+      where.price.gte = priceMin;  // gte valores mayor o igual
+      where.price.lte = priceMax;  // lte  valores menor o igual
+     
+    }
+
+    try {
+      return await this.course.findMany({
+        where,
+      });
+    } catch (error) {
+      console.error('Error al obtener cursos:', error);
+      throw new Error('No se pudieron obtener los cursos');
+    }
   }
 
 

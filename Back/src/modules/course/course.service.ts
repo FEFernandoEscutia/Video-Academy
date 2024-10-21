@@ -17,12 +17,48 @@ export class CourseService extends PrismaClient implements OnModuleInit {
     return await this.course.create({ data: createCourseDto });
   }
 
-  async findAll(): Promise<Course[]> {
-    return await this.course.findMany({include:{
-      videos:true,
-      reviews:true
-    }});
+  async findAll(filterDto: CourseFilterDto): Promise<Course[]> {
+    const { technologies, priceSelector } = filterDto;
+    const techFilter = technologies
+    ? { technologies: { hasSome: Array.isArray(technologies) ? technologies : [technologies] } }
+    : {};
+    const priceFilter = priceSelector;
+    if (!priceFilter) {
+      return await this.course.findMany({
+        where: techFilter,
+        include: {
+          videos: true,
+          reviews: true,
+        },
+      });
+    }
+    if (priceFilter === 'true') {
+      return await this.course.findMany({
+        where: techFilter,
+        orderBy: {
+          price: 'asc',
+        },
+        include: {
+          videos: true,
+          reviews: true,
+        },
+      });
+    }
+    if (priceFilter === 'false') {
+      return await this.course.findMany({
+        where: techFilter,
+        orderBy: {
+          price: 'desc',
+        },
+        include: {
+          videos: true,
+          reviews: true,
+        },
+      });
+    }
   }
+
+  //****************************************************************************************
   async findCourseAvailable(): Promise<Course[]> {
     return await this.course.findMany({
       where: {
@@ -38,29 +74,29 @@ export class CourseService extends PrismaClient implements OnModuleInit {
     return await this.course.findMany({ orderBy: {} });
   }
 
-  async filterCourse(filterDto: CourseFilterDto) {
-    const { technologies, priceMin, priceMax } = filterDto;
-    const where: any = { isAvailable: true };
+  // async filterCourse(filterDto: CourseFilterDto) {
+  //   const { technologies, priceMin, priceMax } = filterDto;
+  //   const where: any = { isAvailable: true };
 
-    if (technologies && technologies.length > 0) {
-      where.technologies = { hasSome: technologies };
-    }
+  //   if (technologies && technologies.length > 0) {
+  //     where.technologies = { hasSome: technologies };
+  //   }
 
-    if (priceMin !== undefined || priceMax !== undefined) {
-      where.price = {};
-      where.price.gte = priceMin; // gte valores mayor o igual
-      where.price.lte = priceMax; // lte  valores menor o igual
-    }
+  //   if (priceMin !== undefined || priceMax !== undefined) {
+  //     where.price = {};
+  //     where.price.gte = priceMin; // gte valores mayor o igual
+  //     where.price.lte = priceMax; // lte  valores menor o igual
+  //   }
 
-    try {
-      return await this.course.findMany({
-        where,
-      });
-    } catch (error) {
-      console.error('Error al obtener cursos:', error);
-      throw new Error('No se pudieron obtener los cursos');
-    }
-  }
+  //   try {
+  //     return await this.course.findMany({
+  //       where,
+  //     });
+  //   } catch (error) {
+  //     console.error('Error al obtener cursos:', error);
+  //     throw new Error('No se pudieron obtener los cursos');
+  //   }
+  // }
 
   async findOne(id: string): Promise<CreateCourseDto> {
     return await this.course.findFirst({

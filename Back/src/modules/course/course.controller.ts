@@ -21,8 +21,8 @@ export class CourseController {
   //****************************************************************************************************
 
   @Get()
-  async findAll(@Req() req: any) {
-    return this.courseService.findAll()
+  async findAll(@Query() filterDto : CourseFilterDto) {
+    return this.courseService.findAll(filterDto)
   }
   //****************************************************************************************************
   @Get('/available')
@@ -38,23 +38,23 @@ export class CourseController {
   
   //****************************************FILTROS DE CURSOS************************************************************
       
-  @Get('/filterCourse')
-  async filterCourse(@Query() filterCourse:CourseFilterDto) {
+  // @Get('/filterCourse')
+  // async filterCourse(@Query() filterCourse:CourseFilterDto) {
 
 
 
   
-    const coursefiltered = await  this.courseService.filterCourse(filterCourse);
+  //   const coursefiltered = await  this.courseService.filterCourse(filterCourse);
   
   
 
-    if(!coursefiltered || (coursefiltered).length === 0){
-      throw new HttpException('no matches found',HttpStatus.BAD_REQUEST)
-    }
+  //   if(!coursefiltered || (coursefiltered).length === 0){
+  //     throw new HttpException('no matches found',HttpStatus.BAD_REQUEST)
+  //   }
 
-    return coursefiltered;
+  //   return coursefiltered;
     
-  }
+  // }
 
 
 

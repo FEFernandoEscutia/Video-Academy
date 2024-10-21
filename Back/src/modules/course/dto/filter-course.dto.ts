@@ -1,22 +1,17 @@
-import { Transform } from 'class-transformer';
-import { IsOptional, IsString,IsArray, IsNumber } from 'class-validator';
+import { IsOptional, IsString, IsBoolean, IsEnum } from 'class-validator';
+enum BooleanString {
+  TRUE = 'true',
+  FALSE = 'false',
+}
 
 export class CourseFilterDto {
-    @IsOptional()
-    @IsArray()
-    @IsString({ each: true })
-    @Transform(({ value }) => typeof value === 'string' ? value.split(',') : value)
-    technologies?: string[];
-  
-    @IsOptional()
-    @IsNumber()
-    @Transform(({ value }) => parseFloat(value))
-    priceMin?: number;
-  
-    @IsOptional()
-    @IsNumber()
-    @Transform(({ value }) => parseFloat(value))
-    priceMax?: number;
+  @IsOptional()
+  @IsString({ each: true })
+  technologies?: string[];
 
-  
+  @IsOptional()
+  @IsEnum(BooleanString, {
+    message: 'price must be either true or false',
+  })
+  priceSelector?: BooleanString;
 }

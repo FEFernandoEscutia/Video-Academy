@@ -10,6 +10,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaClient, Role } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { envs } from 'src/config';
+import { PaginationDto } from 'src/common/pagination.dto';
 
 @Injectable()
 export class UserService extends PrismaClient implements OnModuleInit {
@@ -56,8 +57,27 @@ export class UserService extends PrismaClient implements OnModuleInit {
 
   //****************************************************************************************************
 
-  findAll() {
-    return this.user.findMany({});
+  async findAll(paginationDto: PaginationDto) {
+    const { page, limit } = paginationDto;
+    const totalPages = await this.user.count({});
+    const lastPage = Math.ceil(totalPages / limit);
+    if (page > lastPage) {
+      throw new BadRequestException(
+        `Please select a valid page between 1 to ${lastPage}`,
+      );
+    }
+    return {
+      data: await this.user.findMany({
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      metaData: {
+        page: page,
+        total: totalPages,
+        UsersShown: limit,
+        lastPage: lastPage,
+      },
+    };
   }
 
   //****************************************************************************************************
@@ -98,13 +118,15 @@ export class UserService extends PrismaClient implements OnModuleInit {
   //****************************************************************************************************
 
   async remove(id: string) {
-    const userDb = await this.findOne(id) 
-    if(!userDb){
-      throw new BadRequestException("User does not exist")
+    const userDb = await this.findOne(id);
+    if (!userDb) {
+      throw new BadRequestException('User does not exist');
     }
-    await this.user.delete({where:{
-      id
-    }})
-    return { message:"User has been deleted"}
+    await this.user.delete({
+      where: {
+        id,
+      },
+    });
+    return { message: 'User has been deleted' };
   }
 }

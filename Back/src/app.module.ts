@@ -9,6 +9,7 @@ import { SubscriptionModule } from './modules/subscription/subscription.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { envs } from './config';
+import { SeederModule } from './modules/seeder/seeder.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { envs } from './config';
       signOptions: { expiresIn: '1h' },
       secret: envs.jwtSecret,
     }),
+    SeederModule,
   ],
   controllers: [],
   providers: [],

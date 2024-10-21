@@ -1,0 +1,77 @@
+[
+  {
+    "title": "Basic Web Development Course",
+    "description": "Learn the fundamentals of HTML and CSS to create static websites.",
+    "thumbnail": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjBtOWzb0JrqXDblke7WX5sibTWdYCYsVZTYkkuP9fW5QxD8bbwe7w9RhCNgfM6SXCCYHxZfbxNn6JYvZP7SJ_K9JQyzfBdcR2TxsrlskhF8jLTBz8GKgof72oBo46pFuuaTXzvh7sXwQyn/s1600/css3-html5-e1383236383597.png",
+    "technologies": ["HTML", "CSS"],
+    "price": 99.99,
+    "isAvailable": true,
+    "videos": [
+      {
+        "title": "Introduction to HTML and CSS",
+        "description": "Learn the basics of web development using HTML and CSS.",
+        "url": "https://www.youtube.com/watch?v=XqFR2lqBYPs&ab_channel=freeCodeCampEspa%C3%B1ol"
+      }
+    ]
+  },
+  {
+    "title": "React Development Course",
+    "description": "Learn to build interactive user interfaces with React.",
+    "thumbnail": "https://es.wikipedia.org/wiki/React#/media/Archivo:React.svg",
+    "technologies": ["React"],
+    "price": 129.99,
+    "isAvailable": true,
+    "videos": [
+      {
+        "title": "Getting Started with React",
+        "description": "Introduction to using components in React.",
+        "url": "https://www.youtube.com/watch?v=6Jfk8ic3KVk&ab_channel=freeCodeCampEspa%C3%B1ol"
+      }
+    ]
+  },
+  {
+    "title": "Tailwind CSS Course",
+    "description": "Learn how to build modern and responsive web designs using Tailwind CSS.",
+    "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/d/d5/Tailwind_CSS_Logo.svg",
+    "technologies": ["Tailwind"],
+    "price": 99.99,
+    "isAvailable": true,
+    "videos": [
+      {
+        "title": "Introduction to Tailwind CSS",
+        "description": "Get started with Tailwind CSS for building modern web designs.",
+        "url": "https://www.youtube.com/watch?v=5HtRcMSO1Ro&ab_channel=freeCodeCampEspa%C3%B1ol"
+      }
+    ]
+  },
+  {
+    "title": "TypeScript Course",
+    "description": "Learn how to build robust applications using TypeScript.",
+    "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Typescript_logo_2020.svg/800px-Typescript_logo_2020.svg.png",
+    "technologies": ["TypeScript"],
+    "price": 119.99,
+    "isAvailable": true,
+    "videos": [
+      {
+        "title": "Introduction to TypeScript",
+        "description": "Learn the basics of TypeScript and how to integrate it into your projects.",
+        "url": "https://www.youtube.com/watch?v=T7uaEZ3ZoZE&ab_channel=freeCodeCampEspa%C3%B1ol"
+      }
+    ]
+  },
+  {
+    "title": "APIs with Node.js and Express",
+    "description": "Learn how to build powerful APIs using Node.js and Express.",
+    "thumbnail": "https://programaconleo.com/wp-content/uploads/2022/12/que-es-nodejs.png",
+    "technologies": ["Node.js", "Express"],
+    "price": 149.99,
+    "isAvailable": true,
+    "videos": [
+      {
+        "title": "Introduction to APIs with Node.js and Express",
+        "description": "Learn how to set up and build APIs using Node.js and Express.",
+        "url": "https://www.youtube.com/watch?v=yd_QpXWrbtQ&ab_channel=freeCodeCampEspa%C3%B1ol"
+      }
+    ]
+  }
+]

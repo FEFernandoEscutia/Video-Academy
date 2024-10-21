@@ -10,6 +10,7 @@ import { CourseFilterDto } from './dto/filter-course.dto';
 @Controller('course')
 export class CourseController {
   constructor(private readonly courseService: CourseService) {}
+
   //****************************************************************************************************
   @Post()
   // @UseGuards(AuthGuard, RolesGuard)
@@ -20,18 +21,8 @@ export class CourseController {
   //****************************************************************************************************
 
   @Get()
-  // @UseGuards(AuthGuard, RolesGuard)
-  // @Roles(Role.ADMIN, Role.USER)
   async findAll(@Req() req: any) {
-    const user = req.user;
-  
-    if (user.role === Role.ADMIN) {
-  
-      return this.courseService.findAll();
-    } else if (user.role === Role.USER) {
-     
-      return this.courseService.findCourseAvailable();
-    }
+    return this.courseService.findAll()
   }
   //****************************************************************************************************
   @Get('/available')

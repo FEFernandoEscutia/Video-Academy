@@ -5,25 +5,23 @@ import { Course, PrismaClient } from '@prisma/client';
 import { CourseFilterDto } from './dto/filter-course.dto';
 
 @Injectable()
-export  class CourseService extends PrismaClient implements OnModuleInit{
- 
- 
-
+export class CourseService extends PrismaClient implements OnModuleInit {
   private readonly logger = new Logger('Course Service');
-  onModuleInit() {
+  async onModuleInit() {
     this.$connect();
     this.logger.log('Database Connected');
   }
-  async create(createCourseDto: CreateCourseDto):Promise<CreateCourseDto>{
+
+  //****************************************************************************************
+  async create(createCourseDto: CreateCourseDto): Promise<CreateCourseDto> {
     return await this.course.create({ data: createCourseDto });
   }
 
-  async findAll():Promise<Course[]> {
-    return await this.course.findMany({
-      include:{
-        reviews:true
-      }
-    });
+  async findAll(): Promise<Course[]> {
+    return await this.course.findMany({include:{
+      videos:true,
+      reviews:true
+    }});
   }
   async findCourseAvailable(): Promise<Course[]> {
     return await this.course.findMany({
@@ -31,34 +29,27 @@ export  class CourseService extends PrismaClient implements OnModuleInit{
         isAvailable: true,
       },
       include: {
-        reviews: true, 
+        reviews: true,
       },
     });
   }
 
-
-  async findCoursePopular():Promise<Course[]> {
-     
-    return await this.course.findMany({ orderBy:{
-      
-    }})
-    
+  async findCoursePopular(): Promise<Course[]> {
+    return await this.course.findMany({ orderBy: {} });
   }
 
-  async filterCourse(filterDto:CourseFilterDto) {
-
-    const {technologies,priceMin,priceMax}= filterDto
+  async filterCourse(filterDto: CourseFilterDto) {
+    const { technologies, priceMin, priceMax } = filterDto;
     const where: any = { isAvailable: true };
-    
+
     if (technologies && technologies.length > 0) {
       where.technologies = { hasSome: technologies };
     }
 
     if (priceMin !== undefined || priceMax !== undefined) {
       where.price = {};
-      where.price.gte = priceMin;  // gte valores mayor o igual
-      where.price.lte = priceMax;  // lte  valores menor o igual
-     
+      where.price.gte = priceMin; // gte valores mayor o igual
+      where.price.lte = priceMax; // lte  valores menor o igual
     }
 
     try {
@@ -71,41 +62,41 @@ export  class CourseService extends PrismaClient implements OnModuleInit{
     }
   }
 
-
-  async findOne(id: string):Promise<CreateCourseDto> {
+  async findOne(id: string): Promise<CreateCourseDto> {
     return await this.course.findFirst({
       where: {
-        id:id
-      }
+        id: id,
+      },
     });
   }
 
-  async update(id: string, updateCourseDto: UpdateCourseDto):Promise<UpdateCourseDto> {
-
-    const courseByID =  this.course.findFirst({ where: {id} })
+  async update(
+    id: string,
+    updateCourseDto: UpdateCourseDto,
+  ): Promise<UpdateCourseDto> {
+    const courseByID = this.course.findFirst({ where: { id } });
 
     if (!courseByID) {
       throw new Error('Course not found'); // Manejo de errores si no se encuentra el curso
     }
     return await this.course.update({
-      where: {id},
-      data : updateCourseDto
-      });
+      where: { id },
+      data: updateCourseDto,
+    });
   }
 
-  async remove(id: string):Promise<String> {
-    const  courseId = this.course.findFirst({ where: {id}})
-  
+  async remove(id: string): Promise<String> {
+    const courseId = this.course.findFirst({ where: { id } });
+
     if (!courseId) {
       throw new Error('Course not found'); // Manejo de errores si no se encuentra el curso
     }
-  
+
     // Elimina el curso
     await this.course.delete({
       where: { id },
     });
-  
-    return `El curso con ID ${id} ha sido eliminado exitosamente.`;
-};
 
+    return `El curso con ID ${id} ha sido eliminado exitosamente.`;
+  }
 }

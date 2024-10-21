@@ -25,7 +25,7 @@ export class AuthService extends PrismaClient implements OnModuleInit {
     const dbUser = await this.user.findFirst({
       where: { email: authDto.email },
     });
-    
+
     if (!dbUser) {
       throw new BadRequestException('Invalid username or password');
     }
@@ -42,9 +42,9 @@ export class AuthService extends PrismaClient implements OnModuleInit {
       email: dbUser.email,
       roles: dbUser.role,
     };
-    
+
     const token = this.jwtService.sign(userPayload, { secret: envs.jwtSecret });
-    return { message: `welcome in ${dbUser.name}`, token };
+    return { message: `welcome in ${dbUser.name}`, token, user: dbUser };
   }
   //****************************************************************************************************
 }

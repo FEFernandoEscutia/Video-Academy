@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, ForbiddenException, Query, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, ForbiddenException, Query, HttpException, HttpStatus, UseInterceptors } from '@nestjs/common';
 import { CourseService } from './course.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
@@ -15,13 +15,15 @@ export class CourseController {
   // @UseGuards(AuthGuard, RolesGuard)
   // @Roles(Role.ADMIN)
   async create(@Body() createCourseDto: CreateCourseDto) {
+
     return await  this.courseService.create(createCourseDto);
   }
+
   //****************************************************************************************************
 
   @Get()
-  // @UseGuards(AuthGuard, RolesGuard)
-  // @Roles(Role.ADMIN, Role.USER)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.USER)
   async findAll(@Req() req: any) {
     const user = req.user;
   
@@ -70,7 +72,6 @@ export class CourseController {
 
   //****************************************************************************************************
   @Get(':id')
-  @UseGuards(AuthGuard)
   async findOne(@Param('id') id: string) {
     return await this.courseService.findOne(id);
   }

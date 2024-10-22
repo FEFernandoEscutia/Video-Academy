@@ -4,6 +4,7 @@ import { UpdateCourseDto } from './dto/update-course.dto';
 import { Course, PrismaClient } from '@prisma/client';
 import { CourseFilterDto } from './dto/filter-course.dto';
 
+
 @Injectable()
 export  class CourseService extends PrismaClient implements OnModuleInit{
  
@@ -45,31 +46,41 @@ export  class CourseService extends PrismaClient implements OnModuleInit{
     
   }
 
-  async filterCourse(filterDto:CourseFilterDto) {
-
-    const {technologies,priceMin,priceMax}= filterDto
+  async filterCourse(filterDto: CourseFilterDto) {
+    const { technologies, priceMin, priceMax, dateFrom, dateTo } = filterDto;
     const where: any = { isAvailable: true };
+
     
+    // Filtro por tecnologías
     if (technologies && technologies.length > 0) {
       where.technologies = { hasSome: technologies };
     }
-
+  
+    // Filtro por rango de precios
     if (priceMin !== undefined || priceMax !== undefined) {
       where.price = {};
-      where.price.gte = priceMin;  // gte valores mayor o igual
-      where.price.lte = priceMax;  // lte  valores menor o igual
-     
+      if (priceMin !== undefined) {
+        where.price.gte = priceMin; // Mayor o igual que priceMin
+      }
+      if (priceMax !== undefined) {
+        where.price.lte = priceMax; // Menor o igual que priceMax
+      }
     }
 
-    try {
-      return await this.course.findMany({
-        where,
-      });
-    } catch (error) {
-      console.error('Error al obtener cursos:', error);
-      throw new Error('No se pudieron obtener los cursos');
-    }
+  
+  try {
+    return await this.course.findMany({
+      where,
+      orderBy: {
+        createdAt: 'asc', // Puedes cambiar a 'desc' si deseas el más reciente primero
+      },
+    });
+  } catch (error) {
+    console.error('Error al obtener cursos:', error);
+    throw new Error('No se pudieron obtener los cursos');
   }
+}
+  
 
 
   async findOne(id: string):Promise<CreateCourseDto> {
@@ -107,5 +118,6 @@ export  class CourseService extends PrismaClient implements OnModuleInit{
   
     return `El curso con ID ${id} ha sido eliminado exitosamente.`;
 };
+
 
 }

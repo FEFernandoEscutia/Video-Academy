@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsOptional, IsString,IsArray, IsNumber } from 'class-validator';
+import { IsOptional, IsString,IsArray, IsNumber, IsDateString } from 'class-validator';
 
 export class CourseFilterDto {
     @IsOptional()
@@ -17,6 +17,14 @@ export class CourseFilterDto {
     @IsNumber()
     @Transform(({ value }) => parseFloat(value))
     priceMax?: number;
+
+
+  
+    @IsOptional()
+    dateFrom?: string;
+  
+    @IsOptional()
+    dateTo?: string;
 
   
 }

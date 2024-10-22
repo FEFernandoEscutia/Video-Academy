@@ -61,7 +61,6 @@ export class CourseController {
 
   //****************************************************************************************************
   @Get(':id')
-  @UseGuards(AuthGuard)
   async findOne(@Param('id') id: string) {
     return await this.courseService.findOne(id);
   }

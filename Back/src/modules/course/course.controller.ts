@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, ForbiddenException, Query, HttpException, HttpStatus, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, ForbiddenException, Query, HttpException, HttpStatus } from '@nestjs/common';
 import { CourseService } from './course.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
@@ -10,72 +10,61 @@ import { CourseFilterDto } from './dto/filter-course.dto';
 @Controller('course')
 export class CourseController {
   constructor(private readonly courseService: CourseService) {}
-  //****************************************************************************************************
+
+  //**********************************
   @Post()
   // @UseGuards(AuthGuard, RolesGuard)
   // @Roles(Role.ADMIN)
   async create(@Body() createCourseDto: CreateCourseDto) {
-
     return await  this.courseService.create(createCourseDto);
   }
-
-  //****************************************************************************************************
+  //**********************************
 
   @Get()
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.ADMIN, Role.USER)
-  async findAll(@Req() req: any) {
-    const user = req.user;
-  
-    if (user.role === Role.ADMIN) {
-  
-      return this.courseService.findAll();
-    } else if (user.role === Role.USER) {
-     
-      return this.courseService.findCourseAvailable();
-    }
+  async findAll(@Query() filterDto : CourseFilterDto) {
+    return this.courseService.findAll(filterDto)
   }
-  //****************************************************************************************************
+  //**********************************
   @Get('/available')
   async findCourseAvailable(){
     return await this.courseService.findCourseAvailable();
   }
-  //****************************************************************************************************
+  //**********************************
   @Get('course/popular')
   async findCoursePopular(){
     return await this.courseService.findCoursePopular();
   }
 
   
-  //****************************************FILTROS DE CURSOS************************************************************
+  //*************FILTROS DE CURSOS*********************
       
-  @Get('/filterCourse')
-  async filterCourse(@Query() filterCourse:CourseFilterDto) {
+  // @Get('/filterCourse')
+  // async filterCourse(@Query() filterCourse:CourseFilterDto) {
 
 
 
   
-    const coursefiltered = await  this.courseService.filterCourse(filterCourse);
+  //   const coursefiltered = await  this.courseService.filterCourse(filterCourse);
   
   
 
-    if(!coursefiltered || (coursefiltered).length === 0){
-      throw new HttpException('no matches found',HttpStatus.BAD_REQUEST)
-    }
+  //   if(!coursefiltered || (coursefiltered).length === 0){
+  //     throw new HttpException('no matches found',HttpStatus.BAD_REQUEST)
+  //   }
 
-    return coursefiltered;
+  //   return coursefiltered;
     
-  }
+  // }
 
 
 
 
-  //****************************************************************************************************
+  //**********************************
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return await this.courseService.findOne(id);
   }
-  //****************************************************************************************************
+  //**********************************
 @Patch(':id')
 // @UseGuards(AuthGuard, RolesGuard)
 // @Roles(Role.ADMIN)
@@ -91,7 +80,7 @@ async update(@Param('id') id: string, @Body() updateCourseDto: UpdateCourseDto, 
 }
 
 
-//****************************************************************************************************
+//**********************************
 
 
   @Delete(':id')

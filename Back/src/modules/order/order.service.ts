@@ -19,7 +19,7 @@ export class OrderService extends PrismaClient implements OnModuleInit {
       payment_intent_data: {
         // user info and more details
         metadata: {
-          name:"Fernando"
+          name: 'Fernando',
         },
       },
       // products that people are purchasing

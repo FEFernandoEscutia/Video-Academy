@@ -1,3 +1,4 @@
+version: '3'
 services:
   app:
     container_name: prisma_app
@@ -10,6 +11,7 @@ services:
       - .env
     volumes:
       - .:/app
+      - /app/node_modules  
     command: npm run start:dev
 
   db:

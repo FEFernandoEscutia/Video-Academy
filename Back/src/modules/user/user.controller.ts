@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Req,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -18,6 +19,7 @@ import { AuthGuard } from 'src/guards/auth.guard';
 import { RolesGuard } from 'src/guards/roles.guard';
 import * as bcrypt from 'bcryptjs';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { PaginationDto } from 'src/common/pagination.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -35,15 +37,16 @@ export class UserController {
   //*************************************************************************************
   @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Retrieve all users',
+    summary: 'Retrieve users with pagination',
     description:
-      'This endpoint allows an admin to retrieve a list of all users from the system. Authentication and admin role are required.',
+      'Allows an admin to retrieve a paginated list of users. Optional query parameters: `page` (default 1) and `limit` (default 10). Authentication and admin role required.',
   })
+
   @Get()
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
-  findAll() {
-    return this.userService.findAll();
+  findAll(@Query() paginationDto: PaginationDto) {
+    return this.userService.findAll(paginationDto);
   }
   //*************************************************************************************
   @ApiBearerAuth()

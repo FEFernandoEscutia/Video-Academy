@@ -4,29 +4,44 @@ import { UpdateReviewDto } from './dto/update-review.dto';
 import { PrismaClient } from '@prisma/client';
 
 @Injectable()
-export  class ReviewService extends PrismaClient implements OnModuleInit {
+export class ReviewService extends PrismaClient implements OnModuleInit {
   private readonly logger = new Logger('Review Service');
-  onModuleInit() {
+  async onModuleInit() {
     this.$connect();
     this.logger.log('Database Connected');
   }
-  create(createReviewDto: CreateReviewDto) {
-    return 'This action adds a new review';
+  async create(createReviewDto: CreateReviewDto) {
+    const { content, courseId, userId, rating } = createReviewDto;
+    return this.review.create({
+      data: {
+        content,
+        courseId,
+        userId,
+        rating,
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all review`;
+  async findAll() {
+    return this.review.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} review`;
+  async findOne(id: string) {
+    return this.review.findUnique({
+      where: { id },
+    });
   }
 
-  update(id: number, updateReviewDto: UpdateReviewDto) {
-    return `This action updates a #${id} review`;
+  async update(id: string, updateReviewDto: UpdateReviewDto) {
+    return this.review.update({
+      where: { id },
+      data: updateReviewDto,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} review`;
+  async remove(id: string) {
+    return this.review.delete({
+      where: { id },
+    });
   }
 }

@@ -25,16 +25,16 @@ enum Role {
 // }
 
 model User {
-  id           String        @id @default(uuid())
-  email        String        @unique
-  password     String
-  name         String
-  phone        String        @unique
-  image        String?       @default("https://img.freepik.com/vector-premium/icono-perfil-avatar-predeterminado-imagen-usuario-redes-sociales-icono-avatar-gris-silueta-perfil-blanco-ilustracion-vectorial_561158-3407.jpg?w=740")
-  role         Role          @default(USER)
-  courses      Course[]      @relation("PurchasedCourses") // Relación muchos a muchos: un usuario puede comprar muchos cursos.
-  orders       Order[]
-  reviews      Review[]
+  id       String   @id @default(uuid())
+  email    String   @unique
+  password String
+  name     String
+  phone    String   @unique
+  image    String?  @default("https://img.freepik.com/vector-premium/icono-perfil-avatar-predeterminado-imagen-usuario-redes-sociales-icono-avatar-gris-silueta-perfil-blanco-ilustracion-vectorial_561158-3407.jpg?w=740")
+  role     Role     @default(USER)
+  courses  Course[] @relation("PurchasedCourses") // Relación muchos a muchos: un usuario puede comprar muchos cursos.
+  orders   Order[]
+  reviews  Review[]
   // subscription Subscription?
 }
 
@@ -73,15 +73,15 @@ model Order {
 //En la orden se puede comprar ya sea un curso o una subscripcion
 
 model OrderDetail {
-  id             String       @id @default(uuid())
-  order          Order        @relation(fields: [orderId], references: [id]) // Relación uno a uno: un detalle de orden pertenece a una sola orden.
-  orderId        String       @unique // Este campo almacena el ID de la orden a la que pertenece el detalle. En Prisma, es necesario para gestionar la relación y almacenar la clave foránea que conecta esta entidad con la orden.
-  course         Course?      @relation(fields: [courseId], references: [id]) // Relación muchos a uno: muchos detalles de órdenes pueden referirse a un solo video.
-  courseId       String // Almacena el ID del video. Prisma lo usa para gestionar la relación.
+  id       String  @id @default(uuid())
+  order    Order   @relation(fields: [orderId], references: [id]) // Relación uno a uno: un detalle de orden pertenece a una sola orden.
+  orderId  String  @unique // Este campo almacena el ID de la orden a la que pertenece el detalle. En Prisma, es necesario para gestionar la relación y almacenar la clave foránea que conecta esta entidad con la orden.
+  course   Course? @relation(fields: [courseId], references: [id]) // Relación muchos a uno: muchos detalles de órdenes pueden referirse a un solo video.
+  courseId String // Almacena el ID del video. Prisma lo usa para gestionar la relación.
   // subscription   Subscription? @relation(fields: [subscriptionId], references: [id]) 
   // subscriptionId String
-  quantity       Int
-  price          Float //numeros con decimales
+  quantity Int
+  price    Float //numeros con decimales
 }
 
 model Review {

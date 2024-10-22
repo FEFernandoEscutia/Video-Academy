@@ -4,29 +4,37 @@ import { UpdateVideoDto } from './dto/update-video.dto';
 import { PrismaClient } from '@prisma/client';
 
 @Injectable()
-export  class VideoService extends PrismaClient implements OnModuleInit {
+export class VideoService extends PrismaClient implements OnModuleInit {
   private readonly logger = new Logger('Videos Service');
-  onModuleInit() {
+
+  async onModuleInit() {
     this.$connect();
     this.logger.log('Database Connected');
   }
-  create(createVideoDto: CreateVideoDto) {
-    return 'This action adds a new video';
+  async create(createVideoDto: CreateVideoDto) {
+    return this.video.create({
+      data: createVideoDto,
+    });
   }
 
-  findAll() {
-    return `This action returns all video`;
+  async findAll() {
+    return this.video.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} video`;
+  async findOne(id: string) {
+    return this.video.findUnique({ where: { id } });
   }
 
-  update(id: number, updateVideoDto: UpdateVideoDto) {
-    return `This action updates a #${id} video`;
+  update(id: string, updateVideoDto: UpdateVideoDto) {
+    return this.video.update({
+      where: { id },
+      data: updateVideoDto,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} video`;
+  remove(id: string) {
+    return this.video.delete({
+      where: { id },
+    });
   }
 }

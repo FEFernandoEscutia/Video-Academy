@@ -7,6 +7,7 @@ import { RolesGuard } from 'src/guards/roles.guard';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { Role } from '@prisma/client';
 import { CourseFilterDto } from './dto/filter-course.dto';
+import { SpecialGuard } from 'src/guards/special.guard';
 @Controller('course')
 export class CourseController {
   constructor(private readonly courseService: CourseService) {}
@@ -21,7 +22,11 @@ export class CourseController {
   //****************************************************************************************************
 
   @Get()
-  async findAll(@Query() filterDto : CourseFilterDto) {
+  @UseGuards(SpecialGuard)
+  async findAll(@Query() filterDto : CourseFilterDto, @Req()req : any) {
+    const currentUser = req.user
+    console.log(currentUser);
+    
     return this.courseService.findAll(filterDto)
   }
   //****************************************************************************************************

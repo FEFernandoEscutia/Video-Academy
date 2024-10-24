@@ -8,8 +8,10 @@ import { AuthGuard } from 'src/guards/auth.guard';
 import { Role } from '@prisma/client';
 import { CourseFilterDto } from './dto/filter-course.dto';
 import { ApiOperation, ApiResponse, ApiQuery, ApiParam, ApiTags } from '@nestjs/swagger';
+import { SpecialGuard } from 'src/guards/special.guard';
 
 @ApiTags('Courses')
+
 @Controller('course')
 export class CourseController {
   constructor(private readonly courseService: CourseService) {}
@@ -54,9 +56,13 @@ export class CourseController {
     example: 'true'
   })
   @Get()
+  @UseGuards(SpecialGuard)
   async findAll(@Query() filterDto: CourseFilterDto) {
     return this.courseService.findAll(filterDto);
+
   }
+  //****************************************************************************************************
+ 
 
   //*******************************************  FIND BY ID *************************************** */
   @ApiOperation({

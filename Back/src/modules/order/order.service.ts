@@ -1,9 +1,15 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  OnModuleInit,
+} from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { PrismaClient } from '@prisma/client';
+import { Course, PrismaClient } from '@prisma/client';
 import Stripe from 'stripe';
 import { envs } from 'src/config';
+import { UpdateUserDto } from '../user/dto/update-user.dto';
 
 @Injectable()
 export class OrderService extends PrismaClient implements OnModuleInit {
@@ -13,13 +19,39 @@ export class OrderService extends PrismaClient implements OnModuleInit {
     this.$connect();
     this.logger.log('Database Connected');
   }
-  async create(createOrderDto: CreateOrderDto) {
+  async create(id: string, createOrderDto: CreateOrderDto) {
+    const dbCourse = await this.course.findFirst({
+      where: { id: createOrderDto.id, isAvailable: true },
+    });
+    const dbUser = await this.user.findFirst({ where: { id } });
+    const { name, email, phone } = dbUser;
+
+    if (!dbCourse) {
+      throw new BadRequestException(
+        'Course does not exist or its not available',
+      );
+    }
+    try {
+      const session = await this.payment({ name, email, phone }, dbCourse);
+      console.log(session.status);
+      
+      if (session && session.payment_status === 'paid') {
+        return { message: 'Payment successful and order created!', session };
+      }
+    } catch (error) {
+      throw new BadRequestException('Payment failed, please try again.');
+    }
+  }
+
+  async payment(user: UpdateUserDto, course: Course) {
     const session = await this.stripe.checkout.sessions.create({
       //Here goes the id of the order
       payment_intent_data: {
         // user info and more details
         metadata: {
-          name: 'Fernando',
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
         },
       },
       // products that people are purchasing
@@ -28,9 +60,9 @@ export class OrderService extends PrismaClient implements OnModuleInit {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: 'Course 1',
+              name: course.title,
             },
-            unit_amount: 2000, // 20usd // 2000/100 = 20.00
+            unit_amount: course.price * 100, // 20usd // 2000/100 = 20.00
           },
           quantity: 1,
         },

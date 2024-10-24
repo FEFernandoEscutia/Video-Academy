@@ -6,10 +6,10 @@ import {
 } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { Course, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import Stripe from 'stripe';
 import { envs } from 'src/config';
-import { UpdateUserDto } from '../user/dto/update-user.dto';
+import { Request, Response } from 'express';
 
 @Injectable()
 export class OrderService extends PrismaClient implements OnModuleInit {
@@ -19,7 +19,8 @@ export class OrderService extends PrismaClient implements OnModuleInit {
     this.$connect();
     this.logger.log('Database Connected');
   }
-  async startOrder(id: string, createOrderDto: CreateOrderDto) {
+  //***********************************************************************************
+  async createOrder(id: string, createOrderDto: CreateOrderDto) {
     const dbCourse = await this.course.findFirst({
       where: { id: createOrderDto.id, isAvailable: true },
     });
@@ -27,47 +28,65 @@ export class OrderService extends PrismaClient implements OnModuleInit {
       where: { id },
       include: {
         courses: true,
-        orders:true
+        orders: true,
       },
     });
-    const { name, email, phone } = dbUser;
-    if (dbUser.courses.includes(dbCourse)) {
-      throw new BadRequestException('You already have this course');
-    }
     if (!dbCourse) {
       throw new BadRequestException(
-        'Course does not exist or its not available',
+        'The course does not exist or is unavailable',
       );
     }
-    try {
-      const session = await this.payment({ name, email, phone }, dbCourse);
-      if (session) {
-        const newOrder = await this.order.create({
-          data: {
-            user: { connect: { id: dbUser.id } },
-            status: false,
-          },
-        });
-        return {
-          message: 'Please Proceed with your payment',
-          session,
-          newOrder,
-        };
+    for (const course of dbUser.courses) {
+      if (course.id === dbCourse.id) {
+        throw new BadRequestException(
+          'You already have this course or there is a pending order',
+        );
       }
-    } catch (error) {
-      throw new BadRequestException('Payment failed, please try again.');
     }
-  }
+    for (const order of dbUser.orders) {
+      if (order.courseId === dbCourse.id) {
+        throw new BadRequestException(
+          'You already have this course or there is a pending order',
+        );
+      }
+    }
 
-  async payment(user: UpdateUserDto, course: Course) {
+    return await this.order.create({
+      data: {
+        user: { connect: { id: dbUser.id } },
+        status: false,
+        course: { connect: { id: dbCourse.id } },
+      },
+      include: {
+        course: true,
+      },
+    });
+  }
+  //***********************************************************************************
+
+  async payment(userId: string, createOrderDto: CreateOrderDto) {
+    const dbUser = await this.user.findFirst({ where: { id: userId } });
+    const dbOrder = await this.order.findFirst({
+      where: { id: createOrderDto.id },
+      include: { course: true },
+    });
+    if (!dbOrder) {
+      throw new BadRequestException('Order was not found');
+    }
+    const dbCourse = await this.course.findFirst({
+      where: { id: dbOrder.courseId },
+    });
+
     const session = await this.stripe.checkout.sessions.create({
       //Here goes the id of the order
+      payment_method_types: ['card'],
       payment_intent_data: {
         // user info and more details
         metadata: {
-          name: user.name,
-          email: user.email,
-          phone: user.phone,
+          name: dbUser.id,
+          email: dbUser.email,
+          phone: dbUser.phone,
+          courseId: dbCourse.id,
         },
       },
       // products that people are purchasing
@@ -76,21 +95,48 @@ export class OrderService extends PrismaClient implements OnModuleInit {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: course.title,
+              name: dbCourse.title,
+              description: dbCourse.description,
             },
-            unit_amount: course.price * 100, // 20usd // 2000/100 = 20.00
+            unit_amount: dbCourse.price * 100, // 20usd // 2000/100 = 20.00
           },
           quantity: 1,
         },
       ],
       mode: 'payment',
-      success_url: ``,
+      success_url: `http://localhost:3000/api/users1`,
       cancel_url: 'http://localhost:3000/api/users1',
     });
 
     return session;
   }
+ //*********************************************************************************************
+  async stripeWebhook(req: Request, res: Response) {
+    const signature = req.headers['stripe-signature'];
+    let event: Stripe.Event;
+    const endpointsecret = ""
+    try {
+      event = this.stripe.webhooks.constructEvent(
+        req['rawBody'],
+        signature,
+        endpointsecret,
+      );
+    } catch (err) {
+      res.status(400).send(`Webhook Error: ${err.message}`);
+      return;
+    }
+    console.log({ event });
+    switch (event.type) {
+      case 'charge.succeeded':
+        console.log(event);
+        break;
+      default:
+        console.log(`Event ${event.type} not handled`);
+    }
 
+    return res.status(200).send({ signature });
+  }
+ //*********************************************************************************************
   findAll() {
     return `This action returns all order`;
   }

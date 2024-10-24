@@ -53,8 +53,8 @@ model Course {
   description  String
   thumbnail    String   @default("")
   technologies String[]
-  price        Float    
-  rataing      Float    @default(5)
+  price        Float
+  rating       Float    @default(5)
   isfree       Boolean  @default(false)
   isAvailable  Boolean  @default(true)
   Orders       Order[]

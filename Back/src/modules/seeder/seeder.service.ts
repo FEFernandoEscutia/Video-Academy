@@ -1,7 +1,6 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import preChargedData from '../../helpers/courses.data.json';
-import { title } from 'process';
 
 @Injectable()
 export class SeederService extends PrismaClient implements OnModuleInit {
@@ -24,6 +23,7 @@ export class SeederService extends PrismaClient implements OnModuleInit {
           description: course.description,
           technologies: course.technologies,
           price: course.price,
+          thumbnail:course.thumbnail,
           isAvailable: course.isAvailable,
         },
       });

@@ -22,12 +22,16 @@ export class OrderController {
 
   @Post()
   @UseGuards(AuthGuard)
-  @Roles(Role.USER)
-  create(@Body() createOrderDto: CreateOrderDto, @Req() req: any) {
+  @Roles(Role.USER, Role.ADMIN)
+  createOrder(@Body() createOrderDto: CreateOrderDto, @Req() req: any) {
     const loggedUser = req.user;
-
-    return this.orderService.create(loggedUser.id, createOrderDto);
+    return this.orderService.startOrder(loggedUser.id, createOrderDto);
   }
+
+@Post("webhook")
+async stripeWebhook(){
+
+}
 
   @Get()
   findAll() {

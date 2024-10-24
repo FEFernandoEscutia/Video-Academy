@@ -19,13 +19,20 @@ export class OrderService extends PrismaClient implements OnModuleInit {
     this.$connect();
     this.logger.log('Database Connected');
   }
-  async create(id: string, createOrderDto: CreateOrderDto) {
+  async startOrder(id: string, createOrderDto: CreateOrderDto) {
     const dbCourse = await this.course.findFirst({
       where: { id: createOrderDto.id, isAvailable: true },
     });
-    const dbUser = await this.user.findFirst({ where: { id } });
+    const dbUser = await this.user.findFirst({
+      where: { id },
+      include: {
+        courses: true,
+      },
+    });
     const { name, email, phone } = dbUser;
-
+    if (dbUser.courses.includes(dbCourse)) {
+      throw new BadRequestException('You already have this course');
+    }
     if (!dbCourse) {
       throw new BadRequestException(
         'Course does not exist or its not available',
@@ -33,10 +40,18 @@ export class OrderService extends PrismaClient implements OnModuleInit {
     }
     try {
       const session = await this.payment({ name, email, phone }, dbCourse);
-      console.log(session.status);
-      
-      if (session && session.payment_status === 'paid') {
-        return { message: 'Payment successful and order created!', session };
+      if (session) {
+        const newOrder = await this.order.create({
+          data: {
+            user: { connect: { id: dbUser.id } },
+            status: false,
+          },
+        });
+        return {
+          message: 'Please Proceed with your payment',
+          session,
+          newOrder,
+        };
       }
     } catch (error) {
       throw new BadRequestException('Payment failed, please try again.');
@@ -68,7 +83,7 @@ export class OrderService extends PrismaClient implements OnModuleInit {
         },
       ],
       mode: 'payment',
-      success_url: 'https://www.auth.soyhenry.com/',
+      success_url: `${envs.baseUrl}/orders/Complete`,
       cancel_url: 'http://localhost:3000/api/users1',
     });
 

@@ -70,6 +70,9 @@ export class UserService extends PrismaClient implements OnModuleInit {
       data: await this.user.findMany({
         skip: (page - 1) * limit,
         take: limit,
+        include:{
+          orders:true
+        }
       }),
       metaData: {
         page: page,

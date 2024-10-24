@@ -9,6 +9,7 @@ interface EnvVars {
   ADMIN0_PHONE: string;
   JWT_SECRET: string;
   STRIPE_SECRET: string;
+  BASE_URL:string
 }
 
 const envSchema = joi
@@ -20,6 +21,7 @@ const envSchema = joi
     ADMIN0_PHONE: joi.string().required(),
     JWT_SECRET: joi.string().required(),
     STRIPE_SECRET: joi.string().required(),
+    BASE_URL: joi.string().required(),
   })
   .unknown(true);
 
@@ -39,4 +41,5 @@ export const envs = {
   Admin0phone: envVars.ADMIN0_PHONE,
   jwtSecret: envVars.JWT_SECRET,
   stripeSecret: envVars.STRIPE_SECRET,
+  baseUrl: envVars.BASE_URL
 };

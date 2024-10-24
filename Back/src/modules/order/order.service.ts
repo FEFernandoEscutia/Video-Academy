@@ -84,7 +84,7 @@ export class OrderService extends PrismaClient implements OnModuleInit {
         },
       ],
       mode: 'payment',
-      success_url: `${envs.baseUrl}/orders/Complete`,
+      success_url: ``,
       cancel_url: 'http://localhost:3000/api/users1',
     });
 

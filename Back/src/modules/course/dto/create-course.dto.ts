@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsString,
   IsNotEmpty,
@@ -9,40 +10,62 @@ import {
   MaxLength,
   ArrayNotEmpty,
   IsPositive,
-  IsOptional,
   IsUrl
 } from 'class-validator';
 
 export class CreateCourseDto {
+  @ApiProperty({
+    description: 'Course title',
+    example: 'JavaScript Programming Course',
+    minLength: 5,
+    maxLength: 100,
+  })
   @IsString()
-  @IsNotEmpty({ message: 'El título es obligatorio.' })
-  @MinLength(5, { message: 'El título debe tener al menos 5 caracteres.' })
-  @MaxLength(100, { message: 'El título no puede tener más de 100 caracteres.' })
+  @IsNotEmpty({ message: 'Title is required.' })
+  @MinLength(5, { message: 'Title must be at least 5 characters long.' })
+  @MaxLength(100, { message: 'Title cannot exceed 100 characters.' })
   title: string;
 
+  @ApiProperty({
+    description: 'Course description',
+    example: 'This course covers the basics of JavaScript, including functions, arrays, and objects.',
+    minLength: 20,
+    maxLength: 1000,
+  })
   @IsString()
-  @IsNotEmpty({ message: 'La descripción es obligatoria.' })
-  @MinLength(20, { message: 'La descripción debe tener al menos 20 caracteres.' })
-  @MaxLength(1000, { message: 'La descripción no puede tener más de 1000 caracteres.' })
+  @IsNotEmpty({ message: 'Description is required.' })
+  @MinLength(20, { message: 'Description must be at least 20 characters long.' })
+  @MaxLength(1000, { message: 'Description cannot exceed 1000 characters.' })
   description: string;
 
+  @ApiProperty({
+    description: 'List of technologies covered in the course',
+    example: ['JavaScript', 'Node.js', 'React'],
+    type: [String],
+  })
   @IsArray()
-  @ArrayNotEmpty({ message: 'Debe haber al menos una tecnología.' })
-  @IsString({ each: true, message: 'Cada tecnología debe ser una cadena de texto.' })
+  @ArrayNotEmpty({ message: 'At least one technology is required.' })
+  @IsString({ each: true, message: 'Each technology must be a string.' })
   technologies: string[];
 
+  @ApiProperty({
+    description: 'Course price',
+    example: 49.99,
+    minimum: 0,
+    maximum: 10000,
+  })
   @IsNumber()
-  @IsPositive({ message: 'El precio debe ser un número positivo.' })
-  @Min(0, { message: 'El precio mínimo es 0.' })
-  @Max(10000, { message: 'El precio máximo es 10,000.' })
+  @IsPositive({ message: 'Price must be a positive number.' })
+  @Min(0, { message: 'Minimum price is 0.' })
+  @Max(10000, { message: 'Maximum price is 10,000.' })
   price: number;
 
+  @ApiProperty({
+    description: 'Thumbnail URL for the course',
+    example: 'https://example.com/thumbnail.jpg',
+  })
   @IsString()
-  @IsUrl({}, { message: 'El thumbnail debe ser una URL válida.' })
-  @IsNotEmpty({ message: 'El thumbnail es obligatorio.' })
+  @IsUrl({}, { message: 'Thumbnail must be a valid URL.' })
+  @IsNotEmpty({ message: 'Thumbnail is required.' })
   thumbnail: string;
-
-  @IsString()
-  @IsOptional()
-  createdAt: Date;
 }

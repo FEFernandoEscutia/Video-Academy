@@ -114,7 +114,7 @@ export class OrderService extends PrismaClient implements OnModuleInit {
   async stripeWebhook(req: Request, res: Response) {
     const signature = req.headers['stripe-signature'];
     let event: Stripe.Event;
-    const endpointsecret = ""
+    const endpointsecret = "whsec_AbO6GabDdpCtJoc9TRoXvrlkiOqWlu7N"
     try {
       event = this.stripe.webhooks.constructEvent(
         req['rawBody'],

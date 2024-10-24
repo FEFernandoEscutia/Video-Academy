@@ -65,8 +65,8 @@ model Order {
   course    Course?      @relation(fields: [courseId], references: [id]) // Relación muchos a uno: muchos detalles de órdenes pueden referirse a un solo video.
   courseId  String // Almacena el ID del video. Prisma lo usa para gestionar la relación.
   details   OrderDetail? // Relación uno a uno: una orden puede tener solo un detalle de orden.
-  detailsId String?      @unique // Este campo asegura que cada orden tiene un único detalle.
   createdAt DateTime     @default(now())
+  updatedAt DateTime     @default(now())
 }
 
 //En la orden se puede comprar ya sea un curso o una subscripcion

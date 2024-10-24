@@ -83,9 +83,11 @@ export class OrderService extends PrismaClient implements OnModuleInit {
       payment_intent_data: {
         // user info and more details
         metadata: {
-          name: dbUser.id,
+          name: dbUser.name,
+          userId: dbUser.id,
           email: dbUser.email,
           phone: dbUser.phone,
+          orderId: dbOrder.id,
           courseId: dbCourse.id,
         },
       },
@@ -110,11 +112,11 @@ export class OrderService extends PrismaClient implements OnModuleInit {
 
     return session;
   }
- //*********************************************************************************************
+  //*********************************************************************************************
   async stripeWebhook(req: Request, res: Response) {
     const signature = req.headers['stripe-signature'];
     let event: Stripe.Event;
-    const endpointsecret = "whsec_AbO6GabDdpCtJoc9TRoXvrlkiOqWlu7N"
+    const endpointsecret = 'whsec_AbO6GabDdpCtJoc9TRoXvrlkiOqWlu7N';
     try {
       event = this.stripe.webhooks.constructEvent(
         req['rawBody'],
@@ -122,21 +124,48 @@ export class OrderService extends PrismaClient implements OnModuleInit {
         endpointsecret,
       );
     } catch (err) {
-      res.status(400).send(`Webhook Error: ${err.message}`);
+      console.log(err);
       return;
     }
-    console.log({ event });
+
     switch (event.type) {
       case 'charge.succeeded':
-        console.log(event);
+        const succeeded = event.data.object;
+        const [dbOrder, dbCourse] = await Promise.all([
+          this.order.findFirst({
+            where: { id: succeeded.metadata.orderId },
+            include: { course: true },
+          }),
+          this.course.findFirst({ where: { id: succeeded.metadata.courseId } }),
+        ]);
+        await this.order.update({
+          where: {
+            id: dbOrder.id,
+          },
+          data: {
+            status: true,
+            updatedAt: new Date(),
+            details: {
+              create: {
+                quantity: 1,
+                price: dbOrder.course.price,
+              },
+            },
+          },
+        });
+        await this.user.update({
+          where: { id: succeeded.metadata.userId },
+          data: { courses: { connect: { id: dbCourse.id } } },
+        });
+
         break;
       default:
         console.log(`Event ${event.type} not handled`);
     }
 
-    return res.status(200).send({ signature });
+    return { signature };
   }
- //*********************************************************************************************
+  //*********************************************************************************************
   findAll() {
     return `This action returns all order`;
   }

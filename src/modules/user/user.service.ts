@@ -71,7 +71,8 @@ export class UserService extends PrismaClient implements OnModuleInit {
         skip: (page - 1) * limit,
         take: limit,
         include:{
-          orders:true
+          orders:true,
+          courses:true
         }
       }),
       metaData: {

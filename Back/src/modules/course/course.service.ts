@@ -1,4 +1,4 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { Course, PrismaClient } from '@prisma/client';
@@ -12,7 +12,7 @@ export class CourseService extends PrismaClient implements OnModuleInit {
     this.logger.log('Database Connected');
   }
 
-  //****************************************************************************************
+  //******************************
   async create(createCourseDto: CreateCourseDto): Promise<CreateCourseDto> {
     return await this.course.create({ data: createCourseDto });
   }
@@ -58,7 +58,7 @@ export class CourseService extends PrismaClient implements OnModuleInit {
     }
   }
 
-  //****************************************************************************************
+  //******************************
   async findCourseAvailable(): Promise<Course[]> {
     return await this.course.findMany({
       where: {
@@ -101,6 +101,7 @@ export class CourseService extends PrismaClient implements OnModuleInit {
   async findOne(id: string): Promise<CreateCourseDto> {
     return await this.course.findFirst({
       where: {
+        isAvailable:true,
         id: id,
       },
     });
@@ -121,18 +122,21 @@ export class CourseService extends PrismaClient implements OnModuleInit {
     });
   }
 
-  async remove(id: string): Promise<String> {
-    const courseId = this.course.findFirst({ where: { id } });
-
-    if (!courseId) {
-      throw new Error('Course not found'); // Manejo de errores si no se encuentra el curso
+  async remove(id: string): Promise<string> {
+    // Busca el curso por su ID
+    const course = await this.course.findFirst({ where: { id } });
+  
+    // Si el curso no existe, lanza una excepción 404
+    if (!course) {
+      throw new NotFoundException('Course not found');
     }
-
-    // Elimina el curso
-    await this.course.delete({
+  
+    // Elimina el curso de manera lógica (isAvailable = false)
+    await this.course.update({
       where: { id },
+      data: { isAvailable: false },
     });
-
-    return `El curso con ID ${id} ha sido eliminado exitosamente.`;
+  
+    return `The course with ID ${id} has been successfully deleted.`;
   }
 }

@@ -27,6 +27,7 @@ export class OrderService extends PrismaClient implements OnModuleInit {
       where: { id },
       include: {
         courses: true,
+        orders:true
       },
     });
     const { name, email, phone } = dbUser;

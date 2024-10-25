@@ -67,11 +67,13 @@ export class OrderService extends PrismaClient implements OnModuleInit {
   async payment(userId: string, createOrderDto: CreateOrderDto) {
     const dbUser = await this.user.findFirst({ where: { id: userId } });
     const dbOrder = await this.order.findFirst({
-      where: { id: createOrderDto.id },
+      where: { id: createOrderDto.id, status: false },
       include: { course: true },
     });
     if (!dbOrder) {
-      throw new BadRequestException('Order was not found');
+      throw new BadRequestException(
+        'Order was not found, or has been paid already',
+      );
     }
     const dbCourse = await this.course.findFirst({
       where: { id: dbOrder.courseId },
@@ -157,10 +159,10 @@ export class OrderService extends PrismaClient implements OnModuleInit {
           where: { id: succeeded.metadata.userId },
           data: { courses: { connect: { id: dbCourse.id } } },
         });
-
+        console.log('ordered completed', event.data.object.receipt_url);
         break;
       default:
-        console.log(`Event ${event.type} not handled`);
+        console.log('ordered completed', event.data.object);
     }
 
     return { signature };

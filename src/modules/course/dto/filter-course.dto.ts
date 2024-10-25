@@ -26,4 +26,9 @@ export class CourseFilterDto {
     message: 'price must be either true or false',
   })
   priceSelector?: BooleanString;
+
+  @IsOptional()
+  @IsBoolean()
+  isFree?: boolean;
+
 }

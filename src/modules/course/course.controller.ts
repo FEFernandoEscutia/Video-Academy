@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, NotFoundException, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, NotFoundException, HttpCode, HttpException, HttpStatus } from '@nestjs/common';
 import { CourseService } from './course.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
@@ -62,7 +62,33 @@ export class CourseController {
 
   }
   //****************************************************************************************************
- 
+  //***************************************** search filter by title ***********************************************************
+    
+
+  @ApiOperation({
+    summary: 'Search courses by title',
+    description: `
+      This endpoint allows users to search for courses based on a given keyword in the course titles.
+      If no courses match the provided keyword, a 404 error is returned.
+    `,
+  })
+  @ApiParam({
+    name: 'keyword',
+    description: 'The keyword to search for in course titles',
+    example: 'Course JavaScript',
+  })
+  @ApiResponse({ status: 200, description: 'List of courses matching the title keyword.' })
+  @ApiResponse({ status: 404, description: 'No courses found matching the provided keyword in the title.' })
+  @Get('search')
+  async searchCourses(@Query('keyword') keyword: string) {
+    const searchKeyword = await this.courseService.searchCourses(keyword);
+  
+    if (searchKeyword.length === 0) {
+      throw new HttpException('Not found Result', HttpStatus.NOT_FOUND);
+    }
+    return searchKeyword;
+  }
+  
 
   //*******************************************  FIND BY ID *************************************** */
   @ApiOperation({

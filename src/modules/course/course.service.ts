@@ -18,14 +18,24 @@ export class CourseService extends PrismaClient implements OnModuleInit {
   }
 
   async findAll(filterDto: CourseFilterDto): Promise<Course[]> {
-    const { technologies, priceSelector } = filterDto;
+    const { technologies, priceSelector ,isFree  } = filterDto;
     const techFilter = technologies
     ? { technologies: { hasSome: Array.isArray(technologies) ? technologies : [technologies] } }
     : {};
+
+
+  // Filtro por cursos gratuitos o pagos
+  const freeFilter = isFree !== undefined
+  ? { isFree: isFree === true } // Si isFree es 'true', buscará cursos gratuitos
+  : {};
+
+
     const priceFilter = priceSelector;
     if (!priceFilter) {
       return await this.course.findMany({
-        where: techFilter,
+        where: { ...techFilter,
+               ...freeFilter
+        },
         include: {
           videos: true,
           reviews: true,
@@ -34,7 +44,10 @@ export class CourseService extends PrismaClient implements OnModuleInit {
     }
     if (priceFilter === 'true') {
       return await this.course.findMany({
-        where: techFilter,
+        where: {
+        ...techFilter,
+        ...freeFilter,
+      },
         orderBy: {
           price: 'asc',
         },
@@ -46,7 +59,10 @@ export class CourseService extends PrismaClient implements OnModuleInit {
     }
     if (priceFilter === 'false') {
       return await this.course.findMany({
-        where: techFilter,
+        where: {
+          ...techFilter,
+          ...freeFilter,
+        },
         orderBy: {
           price: 'desc',
         },
@@ -56,6 +72,25 @@ export class CourseService extends PrismaClient implements OnModuleInit {
         },
       });
     }
+  }
+
+
+  async searchCourses(keyword: string) {
+  
+    const lowerKeyword = keyword.toLowerCase();
+
+    const keywords = lowerKeyword.split(' ').filter(word => word.length > 0);
+   
+    return this.course.findMany({
+      where: {
+        OR: keywords.map(word => ({
+          title: {
+            contains: word, 
+            mode: 'insensitive',
+          },
+        })),
+      },
+    });
   }
 
   //******************************

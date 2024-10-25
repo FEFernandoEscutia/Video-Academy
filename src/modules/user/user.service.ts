@@ -19,12 +19,13 @@ export class UserService extends PrismaClient implements OnModuleInit {
   async onModuleInit() {
     this.$connect();
     this.logger.log('Database Connected');
-    const aUser0 = {
+    const hashPassword = await bcrypt.hash(envs.Admin0Password, 10);
+    const aUser0:UpdateUserDto = {
       name: envs.Admin0Name,
       email: envs.Admin0Email,
-      password: envs.Admin0Password,
+      password: hashPassword,
       phone: envs.Admin0phone,
-      role: Role.ADMIN,
+      role: Role.ADMIN
     };
     const dbUser = await this.user.findFirst({
       where: { email: aUser0.email },
@@ -32,7 +33,15 @@ export class UserService extends PrismaClient implements OnModuleInit {
     if (dbUser) {
       return this.logger.log('Admin0 was found');
     }
-    await this.create(aUser0);
+    await this.user.create({
+      data:{
+        name:aUser0.name,
+        email:aUser0.email,
+        password: aUser0.password,
+        phone:aUser0.phone,
+        role:aUser0.role
+      }
+    })
     this.logger.log('Admin0 was created successfully');
   }
 

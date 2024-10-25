@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnModuleInit,
+} from '@nestjs/common';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { Course, PrismaClient } from '@prisma/client';
@@ -23,16 +28,14 @@ export class CourseService extends PrismaClient implements OnModuleInit {
     ? { technologies: { hasSome: Array.isArray(technologies) ? technologies : [technologies] } }
     : {};
 
-
   // Filtro por cursos gratuitos o pagos
   const freeFilter = isfree !== undefined ? { isfree } : {};
+
 
     const priceFilter = priceSelector;
     if (!priceFilter) {
       return await this.course.findMany({
-        where: { ...techFilter,
-               ...freeFilter
-        },
+        where: { ...techFilter, ...freeFilter },
         include: {
           videos: true,
           reviews: true,
@@ -42,9 +45,9 @@ export class CourseService extends PrismaClient implements OnModuleInit {
     if (priceFilter === 'true') {
       return await this.course.findMany({
         where: {
-        ...techFilter,
-        ...freeFilter,
-      },
+          ...techFilter,
+          ...freeFilter,
+        },
         orderBy: {
           price: 'asc',
         },
@@ -71,18 +74,16 @@ export class CourseService extends PrismaClient implements OnModuleInit {
     }
   }
 
-
   async searchCourses(keyword: string) {
-  
     const lowerKeyword = keyword.toLowerCase();
 
-    const keywords = lowerKeyword.split(' ').filter(word => word.length > 0);
-   
+    const keywords = lowerKeyword.split(' ').filter((word) => word.length > 0);
+
     return this.course.findMany({
       where: {
-        OR: keywords.map(word => ({
+        OR: keywords.map((word) => ({
           title: {
-            contains: word, 
+            contains: word,
             mode: 'insensitive',
           },
         })),
@@ -90,6 +91,21 @@ export class CourseService extends PrismaClient implements OnModuleInit {
     });
   }
 
+  //******************************
+  async findMyCourses(id: string) {
+    const dbUser = await this.user.findFirst({
+      where: {
+        id,
+      },
+      include: {
+        courses: true,
+      },
+    });
+    if (!dbUser) {
+      throw new NotFoundException('User Not Found');
+    }
+    return dbUser.courses;
+  }
   //******************************
   async findCourseAvailable(): Promise<Course[]> {
     return await this.course.findMany({
@@ -133,7 +149,7 @@ export class CourseService extends PrismaClient implements OnModuleInit {
   async findOne(id: string): Promise<CreateCourseDto> {
     return await this.course.findFirst({
       where: {
-        isAvailable:true,
+        isAvailable: true,
         id: id,
       },
     });
@@ -157,18 +173,18 @@ export class CourseService extends PrismaClient implements OnModuleInit {
   async remove(id: string): Promise<string> {
     // Busca el curso por su ID
     const course = await this.course.findFirst({ where: { id } });
-  
+
     // Si el curso no existe, lanza una excepción 404
     if (!course) {
       throw new NotFoundException('Course not found');
     }
-  
+
     // Elimina el curso de manera lógica (isAvailable = false)
     await this.course.update({
       where: { id },
       data: { isAvailable: false },
     });
-  
+
     return `The course with ID ${id} has been successfully deleted.`;
   }
 }

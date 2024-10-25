@@ -9,6 +9,7 @@ import {
   UseGuards,
   Req,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -20,6 +21,8 @@ import { RolesGuard } from 'src/guards/roles.guard';
 import * as bcrypt from 'bcryptjs';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { PaginationDto } from 'src/common/pagination.dto';
+import { CreateUserInterceptor } from 'src/interceptors/createUser.interceptor';
+
 
 @ApiTags('users')
 @Controller('users')
@@ -31,6 +34,7 @@ export class UserController {
     summary: 'Create user profile',
     description: `This endpoint allows creating user profiles. Any user can create their own profile. The required data is passed via the 'CreateUserDto'.`,
   })
+  @UseInterceptors(CreateUserInterceptor)
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }

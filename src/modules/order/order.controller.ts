@@ -2,22 +2,21 @@ import {
   Controller,
   Get,
   Post,
-  Body,
-  Patch,
   Param,
-  Delete,
   UseGuards,
   Req,
-  ParseUUIDPipe,
+  Query,
+  BadRequestException,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { Roles } from 'src/decorators/role.decorator';
 import { Role } from '@prisma/client';
 import { Request, Response } from 'express';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('orders')
 @Controller('orders')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
@@ -25,40 +24,62 @@ export class OrderController {
   @Post()
   @UseGuards(AuthGuard)
   @Roles(Role.USER, Role.ADMIN)
-  createOrder(@Body() createOrderDto: CreateOrderDto, @Req() req: any) {
+  @ApiOperation({
+    summary: 'Create a new order',
+    description: `Allows creating a new order for a selected course. Requires authentication.`,
+  })
+  createOrder(@Query() createOrderDto: CreateOrderDto, @Req() req: any) {
     const loggedUser = req.user;
     return this.orderService.createOrder(loggedUser.id, createOrderDto);
   }
   //******************************************************************************************
-  @Post('payment')
+  @Post('start-payment/:id')
+  @ApiOperation({
+    summary: 'Create a Stripe payment session',
+    description: `Starts a Stripe payment session for an unpaid order, including user and course details.`,
+  })
   @UseGuards(AuthGuard)
-  paymentSession(@Body() createOrderDto: CreateOrderDto, @Req() req: any) {
+  paymentSession(@Param('id') orderId: string, @Req() req: any) {
+
+    if (!orderId) {
+      throw new BadRequestException('Please add an order to pay');
+    }
     const loggedUser = req.user;
-    return this.orderService.payment(loggedUser.id, createOrderDto);
+    return this.orderService.payment(loggedUser.id, orderId);
   }
   //******************************************************************************************
   @Post('webhook')
+  @ApiOperation({
+    summary: 'Stripe Webhook (Internal)',
+    description: `Endpoint used by Stripe to send event notifications and complete the purchase process. Not for user access.`,
+  })
   async stripeWebhook(@Req() req: Request, res: Response) {
     return this.orderService.stripeWebhook(req, res);
   }
   //******************************************************************************************
   @Get()
-  findAll() {
-    return this.orderService.findAll();
+  @ApiOperation({
+    summary: 'Get user or all orders',
+    description: `Retrieves the logged-in user's orders. Admins can retrieve all orders, while regular users only see their own.`,
+  })
+  @UseGuards(AuthGuard)
+  @Roles(Role.USER, Role.ADMIN)
+  findAll(@Req() req: any) {
+    const loggedUser = req.user;
+
+    return this.orderService.findAll(loggedUser.id);
   }
+
   //******************************************************************************************
   @Get(':id')
+  @ApiOperation({
+    summary: 'Get order by ID',
+    description: `Retrieve the details of a specific order by its ID. Only accessible to admins.`,
+  })
+  @UseGuards(AuthGuard)
+  @Roles(Role.ADMIN)
   findOne(@Param('id') id: string) {
-    return this.orderService.findOne(+id);
-  }
-  //******************************************************************************************
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
-    return this.orderService.update(+id, updateOrderDto);
-  }
-  //******************************************************************************************
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.orderService.remove(+id);
+
+    return this.orderService.findOne(id);
   }
 }

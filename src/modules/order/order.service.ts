@@ -6,10 +6,11 @@ import {
 } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Role } from '@prisma/client';
 import Stripe from 'stripe';
 import { envs } from 'src/config';
 import { Request, Response } from 'express';
+import { UUID } from 'crypto';
 
 @Injectable()
 export class OrderService extends PrismaClient implements OnModuleInit {
@@ -64,14 +65,16 @@ export class OrderService extends PrismaClient implements OnModuleInit {
   }
   //***********************************************************************************
 
-  async payment(userId: string, createOrderDto: CreateOrderDto) {
+  async payment(userId: string, orderId: string) {
     const dbUser = await this.user.findFirst({ where: { id: userId } });
     const dbOrder = await this.order.findFirst({
-      where: { id: createOrderDto.id },
+      where: { id: orderId, status: false },
       include: { course: true },
     });
     if (!dbOrder) {
-      throw new BadRequestException('Order was not found');
+      throw new BadRequestException(
+        'Order was not found, or has been paid already',
+      );
     }
     const dbCourse = await this.course.findFirst({
       where: { id: dbOrder.courseId },
@@ -149,6 +152,7 @@ export class OrderService extends PrismaClient implements OnModuleInit {
               create: {
                 quantity: 1,
                 price: dbOrder.course.price,
+                ticket: event.data.object.receipt_url,
               },
             },
           },
@@ -157,28 +161,43 @@ export class OrderService extends PrismaClient implements OnModuleInit {
           where: { id: succeeded.metadata.userId },
           data: { courses: { connect: { id: dbCourse.id } } },
         });
-
         break;
       default:
-        console.log(`Event ${event.type} not handled`);
+        break;
     }
 
-    return { signature };
+    return;
   }
   //*********************************************************************************************
-  findAll() {
-    return `This action returns all order`;
+  async findAll(loggedUserId: UUID) {
+    const dbUser = await this.user.findFirst({
+      where: {
+        id: loggedUserId,
+      },
+    });
+    if (!dbUser) {
+      throw new BadRequestException('user does not exist');
+    }
+    if (dbUser.role === Role.USER)
+      return this.order.findMany({
+        where: { userId: dbUser.id, status: true },
+        include: {
+          details: true,
+        },
+      });
+
+    return await this.order.findMany({ include: { details: true } });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
-  }
-
-  update(id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} order`;
+  async findOne(id: string) {
+    const dbOrder = await this.order.findFirst({
+      where: {
+        id,
+      },
+    });
+    if (!dbOrder) {
+      throw new BadRequestException('Order not found');
+    }
+    return dbOrder;
   }
 }

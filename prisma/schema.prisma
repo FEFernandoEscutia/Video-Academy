@@ -75,8 +75,7 @@ model OrderDetail {
   id       String @id @default(uuid())
   order    Order  @relation(fields: [orderId], references: [id]) // Relación uno a uno: un detalle de orden pertenece a una sola orden.
   orderId  String @unique // Este campo almacena el ID de la orden a la que pertenece el detalle. En Prisma, es necesario para gestionar la relación y almacenar la clave foránea que conecta esta entidad con la orden.
-  // subscription   Subscription? @relation(fields: [subscriptionId], references: [id]) 
-  // subscriptionId String
+  ticket   String?
   quantity Int
   price    Float //numeros con decimales
 }
@@ -89,13 +88,3 @@ model Review {
   user     User   @relation(fields: [userId], references: [id]) // Relación muchos a uno: muchas reseñas pueden pertenecer a un solo usuario.
   userId   String // Este campo almacena el ID del usuario que escribió la reseña. Prisma lo usa para gestionar la relación y almacenar el ID en la tabla de reseñas.
 }
-
-// model Subscription {
-//   id          String           @id @default(uuid())
-//   type        SubscriptionType // Enum para tipo de suscripción.
-//   user        User             @relation(fields: [userId], references: [id]) // Relación uno a uno: una suscripción pertenece a un solo usuario.
-//   userId      String           @unique // Este campo almacena el ID del usuario que tiene la suscripción. En Prisma, se utiliza para vincular la suscripción con el usuario correspondiente.
-//   startDate   DateTime
-//   endDate     DateTime
-//   OrderDetail OrderDetail[]
-// }

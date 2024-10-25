@@ -1,4 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { IsOptional, IsString, IsBoolean, IsEnum } from 'class-validator';
 
 enum BooleanString {
@@ -29,6 +30,7 @@ export class CourseFilterDto {
 
   @IsOptional()
   @IsBoolean()
-  isFree?: boolean;
+  @Transform(({ value }) => value === 'true' || value === true)
+  isfree?: boolean;
 
 }

@@ -18,17 +18,14 @@ export class CourseService extends PrismaClient implements OnModuleInit {
   }
 
   async findAll(filterDto: CourseFilterDto): Promise<Course[]> {
-    const { technologies, priceSelector ,isFree  } = filterDto;
+    const { technologies, priceSelector ,isfree  } = filterDto;
     const techFilter = technologies
     ? { technologies: { hasSome: Array.isArray(technologies) ? technologies : [technologies] } }
     : {};
 
 
   // Filtro por cursos gratuitos o pagos
-  const freeFilter = isFree !== undefined
-  ? { isFree: isFree === true } // Si isFree es 'true', buscará cursos gratuitos
-  : {};
-
+  const freeFilter = isfree !== undefined ? { isfree } : {};
 
     const priceFilter = priceSelector;
     if (!priceFilter) {

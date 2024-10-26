@@ -17,3 +17,5 @@ steps:
         "northamerica-northeast1-docker.pkg.dev/consolelearn-439802/image-registry/console-learn",
       ]
 
+options:
+  logging: CLOUD_LOGGING_ONLY

@@ -2,7 +2,7 @@ version: '3'
 services:
   app:
     container_name: prisma_app
-    build: .
+    image: node:alpine  # Usando la imagen de Node con Alpine
     ports:
       - '3000:3000'
     depends_on:
@@ -12,7 +12,9 @@ services:
     volumes:
       - .:/app
       - /app/node_modules  
-    command: npm run start:dev
+    working_dir: /app
+    command: npm run start:dev  # Usando tu comando para desarrollo
+    restart: always
 
   db:
     container_name: postgres_db

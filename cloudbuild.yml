@@ -6,7 +6,7 @@ steps:
         "-t",
         "northamerica-northeast1-docker.pkg.dev/consolelearn-439802/image-registry/console-learn",
         "-f",
-        "Dockerfile",
+        "dockerfile",
         "--platform=linux/amd64",
         ".",
       ]

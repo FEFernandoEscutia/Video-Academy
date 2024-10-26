@@ -52,16 +52,19 @@ export class OrderService extends PrismaClient implements OnModuleInit {
       }
     }
 
-    return await this.order.create({
-      data: {
-        user: { connect: { id: dbUser.id } },
-        status: false,
-        course: { connect: { id: dbCourse.id } },
-      },
-      include: {
-        course: true,
-      },
-    });
+    return {
+      message: 'Proceeding with your payment',
+      data: await this.order.create({
+        data: {
+          user: { connect: { id: dbUser.id } },
+          status: false,
+          course: { connect: { id: dbCourse.id } },
+        },
+        include: {
+          course: true,
+        },
+      }),
+    };
   }
   //***********************************************************************************
 

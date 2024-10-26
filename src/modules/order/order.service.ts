@@ -180,7 +180,7 @@ export class OrderService extends PrismaClient implements OnModuleInit {
     }
     if (dbUser.role === Role.USER)
       return this.order.findMany({
-        where: { userId: dbUser.id, status: true },
+        where: { userId: dbUser.id },
         include: {
           details: true,
         },

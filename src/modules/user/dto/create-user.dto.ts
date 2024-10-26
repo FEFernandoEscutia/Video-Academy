@@ -38,7 +38,7 @@ export class CreateUserDto {
   password: string;
 
   @ApiProperty({
-    description: 'The phone number of the user, in an international format. The "+" sign will be automatically added by an interceptor.',
+    description: 'The phone number of the user, in an international format. The "+" sign will be automatically added by an interceptor',
     example: '1234567890',
   })  
   @IsNotEmpty()

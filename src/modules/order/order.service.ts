@@ -186,10 +186,11 @@ export class OrderService extends PrismaClient implements OnModuleInit {
         where: { userId: dbUser.id },
         include: {
           details: true,
+          course:true
         },
       });
 
-    return await this.order.findMany({ include: { details: true } });
+    return await this.order.findMany({ include: { details: true, course:true} });
   }
 
   async findOne(id: string) {

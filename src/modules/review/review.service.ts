@@ -19,16 +19,59 @@ export class ReviewService extends PrismaClient implements OnModuleInit {
         userId,
         rating,
       },
+      include: {
+        course: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
     });
   }
 
   async findAll() {
-    return this.review.findMany();
+    return this.review.findMany({
+      include: {
+        course: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
   }
 
   async findOne(id: string) {
     return this.review.findUnique({
       where: { id },
+      include: {
+        course: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
     });
   }
 
@@ -36,12 +79,40 @@ export class ReviewService extends PrismaClient implements OnModuleInit {
     return this.review.update({
       where: { id },
       data: updateReviewDto,
+      include: {
+        course: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
     });
   }
 
   async remove(id: string) {
     return this.review.delete({
       where: { id },
+      include: {
+        course: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
     });
   }
 }

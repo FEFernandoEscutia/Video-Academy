@@ -29,7 +29,9 @@ export class ReviewController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Retrieve all reviews' })
+  @ApiOperation({
+    summary: 'Retrieve all reviews with course and user information',
+  })
   @ApiResponse({
     status: 200,
     description: 'List of reviews successfully retrieved.',
@@ -39,8 +41,13 @@ export class ReviewController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Retrieve a review by ID' })
-  @ApiResponse({ status: 200, description: 'Review successfully retrieved.' })
+  @ApiOperation({
+    summary: 'Retrieve a review by ID with course and user information',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Review successfully retrieved.',
+  })
   @ApiResponse({ status: 404, description: 'Review not found.' })
   findOne(@Param('id') id: string) {
     return this.reviewService.findOne(id);
@@ -48,7 +55,10 @@ export class ReviewController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a review by ID' })
-  @ApiResponse({ status: 200, description: 'Review successfully updated.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Review successfully updated.',
+  })
   @ApiResponse({ status: 404, description: 'Review not found.' })
   update(@Param('id') id: string, @Body() updateReviewDto: UpdateReviewDto) {
     return this.reviewService.update(id, updateReviewDto);
@@ -56,7 +66,10 @@ export class ReviewController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a review by ID' })
-  @ApiResponse({ status: 200, description: 'Review successfully deleted.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Review successfully deleted.',
+  })
   @ApiResponse({ status: 404, description: 'Review not found.' })
   remove(@Param('id') id: string) {
     return this.reviewService.remove(id);

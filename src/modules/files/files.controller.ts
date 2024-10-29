@@ -50,7 +50,7 @@ export class FilesController {
       new ParseFilePipe({
         validators: [
           new FileTypeValidator({
-            fileType: /(jpg|jpeg|png|webp)$/,
+            fileType: /(jpg|jpeg|webp)$/,
           }),
         ],
       }),

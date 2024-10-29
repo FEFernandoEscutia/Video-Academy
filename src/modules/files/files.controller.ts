@@ -5,6 +5,7 @@ import {
   Param,
   ParseFilePipe,
   Post,
+  Req,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -22,11 +23,13 @@ import { AuthGuard } from 'src/guards/auth.guard';
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
-  @Post()
-  // @UseGuards(AuthGuard, RolesGuard)
-  // @Roles(Role.ADMIN)
+  @Post('user:id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.USER)
   @UseInterceptors(FileInterceptor('image'))
-  @ApiOperation({ summary: 'Upload an image file for a specific product' })
+  @ApiOperation({ summary: 'Upload an image file for an specific User',
+    description:"USERS can upload an image only for their own profile, ADMINS can upload an image for any user by specifying the user ID."
+  })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -41,7 +44,8 @@ export class FilesController {
     },
   })
   async uploadFileUsingId(
-    // @Param('id') id: string,
+    @Param('id') id: string,
+    @Req() req: any,
     @UploadedFile(
       new ParseFilePipe({
         validators: [
@@ -51,9 +55,16 @@ export class FilesController {
         ],
       }),
     )
-  //
     file: Express.Multer.File,
   ) {
-    console.log(file);
+    const loggedUser = req.user;
+
+    if (loggedUser.roles === Role.USER) {
+      this.filesService.uploadFileUsingId(loggedUser.id, file);
+    }
+    if (loggedUser.roles === Role.ADMIN) {
+      console.log(loggedUser);
+      this.filesService.uploadFileUsingId(id, file);
+    }
   }
 }

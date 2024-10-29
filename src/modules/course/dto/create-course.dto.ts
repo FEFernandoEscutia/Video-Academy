@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsString,
   IsNotEmpty,
@@ -10,7 +11,8 @@ import {
   MaxLength,
   ArrayNotEmpty,
   IsPositive,
-  IsUrl
+  IsUrl,
+  IsOptional,
 } from 'class-validator';
 
 export class CreateCourseDto {
@@ -28,25 +30,19 @@ export class CreateCourseDto {
 
   @ApiProperty({
     description: 'Course description',
-    example: 'This course covers the basics of JavaScript, including functions, arrays, and objects.',
+    example:
+      'This course covers the basics of JavaScript, including functions, arrays, and objects.',
     minLength: 20,
     maxLength: 1000,
   })
   @IsString()
   @IsNotEmpty({ message: 'Description is required.' })
-  @MinLength(20, { message: 'Description must be at least 20 characters long.' })
+  @MinLength(20, {
+    message: 'Description must be at least 20 characters long.',
+  })
   @MaxLength(1000, { message: 'Description cannot exceed 1000 characters.' })
   description: string;
 
-  @ApiProperty({
-    description: 'List of technologies covered in the course',
-    example: ['JavaScript', 'Node.js', 'React'],
-    type: [String],
-  })
-  @IsArray()
-  @ArrayNotEmpty({ message: 'At least one technology is required.' })
-  @IsString({ each: true, message: 'Each technology must be a string.' })
-  technologies: string[];
 
   @ApiProperty({
     description: 'Course price',
@@ -58,6 +54,7 @@ export class CreateCourseDto {
   @IsPositive({ message: 'Price must be a positive number.' })
   @Min(0, { message: 'Minimum price is 0.' })
   @Max(10000, { message: 'Maximum price is 10,000.' })
+  @Type(() => Number)
   price: number;
 
   @ApiProperty({
@@ -66,6 +63,6 @@ export class CreateCourseDto {
   })
   @IsString()
   @IsUrl({}, { message: 'Thumbnail must be a valid URL.' })
-  @IsNotEmpty({ message: 'Thumbnail is required.' })
-  thumbnail: string;
+  @IsOptional({ message: 'Thumbnail is optional.' })
+  thumbnail?: string;
 }

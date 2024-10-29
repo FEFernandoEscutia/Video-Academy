@@ -12,6 +12,10 @@ import {
   HttpException,
   HttpStatus,
   Req,
+  UseInterceptors,
+  UploadedFile,
+  ParseFilePipe,
+  FileTypeValidator,
 } from '@nestjs/common';
 import { CourseService } from './course.service';
 import { CreateCourseDto } from './dto/create-course.dto';
@@ -27,8 +31,11 @@ import {
   ApiQuery,
   ApiParam,
   ApiTags,
+  ApiConsumes,
+  ApiBody,
 } from '@nestjs/swagger';
 import { SpecialGuard } from 'src/guards/special.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Courses')
 @Controller('course')
@@ -48,12 +55,38 @@ export class CourseController {
     description: 'Forbidden. Only Admins can create courses.',
   })
   @Post()
-  @UseGuards(AuthGuard, RolesGuard)
+  // @UseGuards(AuthGuard, RolesGuard)
+  @UseInterceptors(FileInterceptor('image'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        image: {
+          type: 'string',
+          format: 'binary',
+          description: 'Image file to upload (jpg, jpeg, png, or webp)',
+        },
+      },
+    },
+  })
   @Roles(Role.ADMIN)
-  async create(@Body() createCourseDto: CreateCourseDto) {
-    return await this.courseService.create(createCourseDto);
+  async create(
+    @Query('technologies') techs: string[],
+    @Body() createCourseDto: CreateCourseDto,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new FileTypeValidator({
+            fileType: /(jpg|jpeg|png|webp)$/,
+          }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+  ) {
+    return await this.courseService.create(techs, createCourseDto, file);
   }
-
 
   //************************************* FIND ALL COURSE *********************************** */
   @ApiOperation({
@@ -85,18 +118,18 @@ export class CourseController {
   async findAll(@Query() filterDto: CourseFilterDto) {
     return this.courseService.findAll(filterDto);
   }
-   //**********************************FIND MY COURSES **********************************************
+  //**********************************FIND MY COURSES **********************************************
 
-   @Get("My-Courses")
-   @ApiOperation({
+  @Get('My-Courses')
+  @ApiOperation({
     summary: 'Get user’s purchased courses',
     description: `Retrieves all courses bought by the logged-in user. Authentication required.`,
   })
-   @UseGuards(AuthGuard)
-   async findMyCourses(@Req() req: any) {
-     const loggedUser = req.user;
-     return this.courseService.findMyCourses(loggedUser.id);
-   }
+  @UseGuards(AuthGuard)
+  async findMyCourses(@Req() req: any) {
+    const loggedUser = req.user;
+    return this.courseService.findMyCourses(loggedUser.id);
+  }
   //***************************************** search filter by title ***********************************************************
 
   @ApiOperation({

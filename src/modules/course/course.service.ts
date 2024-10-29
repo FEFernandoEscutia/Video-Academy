@@ -8,7 +8,8 @@ import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { Course, PrismaClient } from '@prisma/client';
 import { CourseFilterDto } from './dto/filter-course.dto';
-
+import { UploadApiResponse, v2 } from 'cloudinary';
+const toStream = require('buffer-to-stream');
 @Injectable()
 export class CourseService extends PrismaClient implements OnModuleInit {
   private readonly logger = new Logger('Course Service');
@@ -18,19 +19,55 @@ export class CourseService extends PrismaClient implements OnModuleInit {
   }
 
   //******************************
-  async create(createCourseDto: CreateCourseDto): Promise<CreateCourseDto> {
-    return await this.course.create({ data: createCourseDto });
+  async create(
+    techs: string[],
+    createCourseDto: CreateCourseDto,
+    file: Express.Multer.File,
+  ) {
+    const { thumbnail, ...data } = createCourseDto;
+    new Promise((resolve, reject) => {
+      const upload = v2.uploader.upload_stream(
+        {
+          resource_type: 'auto',
+          transformation: [{ transformation: 'Regular size' }],
+        },
+        async (error, result: UploadApiResponse) => {
+          if (error) {
+            reject(error);
+          } else {
+            const newCourse = {
+              ...data,
+              thumbnail: result.url,
+              technologies: techs,
+            };
+          
+
+            await this.course.create({ data: newCourse });
+
+            resolve(result);
+          }
+        },
+      );
+      toStream(file.buffer).pipe(upload);
+    });
+
+    return { message: 'Course Created Successfully' };
   }
-
+  //******************************
   async findAll(filterDto: CourseFilterDto): Promise<Course[]> {
-    const { technologies, priceSelector ,isfree  } = filterDto;
+    const { technologies, priceSelector, isfree } = filterDto;
     const techFilter = technologies
-    ? { technologies: { hasSome: Array.isArray(technologies) ? technologies : [technologies] } }
-    : {};
+      ? {
+          technologies: {
+            hasSome: Array.isArray(technologies)
+              ? technologies
+              : [technologies],
+          },
+        }
+      : {};
 
-  // Filtro por cursos gratuitos o pagos
-  const freeFilter = isfree !== undefined ? { isfree } : {};
-
+    // Filtro por cursos gratuitos o pagos
+    const freeFilter = isfree !== undefined ? { isfree } : {};
 
     const priceFilter = priceSelector;
     if (!priceFilter) {

@@ -55,7 +55,6 @@ export class CourseController {
     return await this.courseService.create(createCourseDto);
   }
 
-
   //************************************* FIND ALL COURSE *********************************** */
   @ApiOperation({
     summary: 'Retrieve all courses',
@@ -86,18 +85,18 @@ export class CourseController {
   async findAll(@Query() filterDto: CourseFilterDto) {
     return this.courseService.findAll(filterDto);
   }
-   //**********************************FIND MY COURSES **********************************************
+  //**********************************FIND MY COURSES **********************************************
 
-   @Get("My-Courses")
-   @ApiOperation({
+  @Get('My-Courses')
+  @ApiOperation({
     summary: 'Get user’s purchased courses',
     description: `Retrieves all courses bought by the logged-in user. Authentication required.`,
   })
-   @UseGuards(AuthGuard)
-   async findMyCourses(@Req() req: any) {
-     const loggedUser = req.user;
-     return this.courseService.findMyCourses(loggedUser.id);
-   }
+  @UseGuards(AuthGuard)
+  async findMyCourses(@Req() req: any) {
+    const loggedUser = req.user;
+    return this.courseService.findMyCourses(loggedUser.id);
+  }
   //***************************************** search filter by title ***********************************************************
 
   @ApiOperation({

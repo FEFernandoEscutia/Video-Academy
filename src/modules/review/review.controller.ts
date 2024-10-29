@@ -6,11 +6,16 @@ import {
   Patch,
   Param,
   Delete,
+  //UseGuards,
 } from '@nestjs/common';
 import { ReviewService } from './review.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+//import { Roles } from 'src/decorators/role.decorator';
+//import { AuthGuard } from '@nestjs/passport';
+//import { Role } from '@prisma/client';
+//import { RolesGuard } from 'src/guards/roles.guard';
 
 @ApiTags('Reviews')
 @Controller('review')
@@ -24,6 +29,7 @@ export class ReviewController {
     description: 'The review has been successfully created.',
   })
   @ApiResponse({ status: 400, description: 'Invalid data provided.' })
+  //@UseGuards(AuthGuard)
   create(@Body() createReviewDto: CreateReviewDto) {
     return this.reviewService.create(createReviewDto);
   }
@@ -36,6 +42,7 @@ export class ReviewController {
     status: 200,
     description: 'List of reviews successfully retrieved.',
   })
+  //@UseGuards(AuthGuard)
   findAll() {
     return this.reviewService.findAll();
   }
@@ -60,6 +67,8 @@ export class ReviewController {
     description: 'Review successfully updated.',
   })
   @ApiResponse({ status: 404, description: 'Review not found.' })
+  //@UseGuards(AuthGuard, RolesGuard)
+  //@Roles(Role.ADMIN)
   update(@Param('id') id: string, @Body() updateReviewDto: UpdateReviewDto) {
     return this.reviewService.update(id, updateReviewDto);
   }
@@ -71,6 +80,8 @@ export class ReviewController {
     description: 'Review successfully deleted.',
   })
   @ApiResponse({ status: 404, description: 'Review not found.' })
+  //@UseGuards(AuthGuard, RolesGuard)
+  // @Roles(Role.ADMIN)
   remove(@Param('id') id: string) {
     return this.reviewService.remove(id);
   }

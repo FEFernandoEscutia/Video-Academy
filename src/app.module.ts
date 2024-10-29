@@ -7,8 +7,12 @@ import { OrderModule } from './modules/order/order.module';
 import { ReviewModule } from './modules/review/review.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
-import { envs } from './config';
+import { cloudinaryConfig, envs } from './config';
 import { SeederModule } from './modules/seeder/seeder.module';
+import { FilesModule } from './modules/files/files.module';
+
+
+
 
 @Module({
   imports: [
@@ -24,8 +28,9 @@ import { SeederModule } from './modules/seeder/seeder.module';
       secret: envs.jwtSecret,
     }),
     SeederModule,
+    FilesModule
   ],
   controllers: [],
-  providers: [],
+  providers: [cloudinaryConfig],
 })
 export class AppModule {}

@@ -1,4 +1,15 @@
-import { Controller, FileTypeValidator, MaxFileSizeValidator, Param, ParseFilePipe, Post, UploadedFile, UseGuards, UseInterceptors, UsePipes } from '@nestjs/common';
+import {
+  Controller,
+  FileTypeValidator,
+  MaxFileSizeValidator,
+  Param,
+  ParseFilePipe,
+  Post,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+  UsePipes,
+} from '@nestjs/common';
 import { FilesService } from './files.service';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { Roles } from 'src/decorators/role.decorator';
@@ -11,11 +22,10 @@ import { AuthGuard } from 'src/guards/auth.guard';
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
-
-  @Post('uploadImage/:id')
+  @Post()
   // @UseGuards(AuthGuard, RolesGuard)
   // @Roles(Role.ADMIN)
-  @UseInterceptors(FileInterceptor("image"))
+  @UseInterceptors(FileInterceptor('image'))
   @ApiOperation({ summary: 'Upload an image file for a specific product' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -31,7 +41,7 @@ export class FilesController {
     },
   })
   async uploadFileUsingId(
-    @Param('id') id: string,
+    // @Param('id') id: string,
     @UploadedFile(
       new ParseFilePipe({
         validators: [
@@ -41,8 +51,9 @@ export class FilesController {
         ],
       }),
     )
+    //
     file: Express.Multer.File,
   ) {
-    console.log(id, file);
+    console.log(file);
   }
 }

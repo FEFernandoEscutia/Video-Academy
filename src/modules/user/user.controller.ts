@@ -22,6 +22,8 @@ import * as bcrypt from 'bcryptjs';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { PaginationDto } from 'src/common/pagination.dto';
 import { CreateUserInterceptor } from 'src/interceptors/createUser.interceptor';
+import { config as dotenvConfig } from 'dotenv';
+dotenvConfig({ path: '.env.development' });
 
 
 

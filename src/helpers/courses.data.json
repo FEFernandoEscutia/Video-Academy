@@ -2,7 +2,7 @@
   {
     "title": "Basic Web Development Course",
     "description": "Learn the fundamentals of HTML and CSS to create static websites.",
-    "thumbnail": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjBtOWzb0JrqXDblke7WX5sibTWdYCYsVZTYkkuP9fW5QxD8bbwe7w9RhCNgfM6SXCCYHxZfbxNn6JYvZP7SJ_K9JQyzfBdcR2TxsrlskhF8jLTBz8GKgof72oBo46pFuuaTXzvh7sXwQyn/s1600/css3-html5-e1383236383597.png",
+    "thumbnail": "https://res.cloudinary.com/dmj3zxwsb/image/upload/b_rgb:FFFFFF/c_pad,w_500,h_300/v1730079988/css3-html5-e1383236383597_qxiww5.png",
     "technologies": ["HTML", "CSS", "Front-end"],
     "price": 99.99,
     "isAvailable": true,
@@ -17,7 +17,7 @@
   {
     "title": "React Development Course",
     "description": "Learn to build interactive user interfaces with React.",
-    "thumbnail": "https://es.wikipedia.org/wiki/React#/media/Archivo:React.svg",
+    "thumbnail": "https://res.cloudinary.com/dmj3zxwsb/image/upload/b_rgb:FFFFFF/c_pad,w_500,h_300/v1729649721/structure_1_ulug1g.png",
     "technologies": ["React", "Front-end"],
     "price": 129.99,
     "isAvailable": true,
@@ -62,7 +62,7 @@
   {
     "title": "APIs with Node.js and Express",
     "description": "Learn how to build powerful APIs using Node.js and Express.",
-    "thumbnail": "https://programaconleo.com/wp-content/uploads/2022/12/que-es-nodejs.png",
+    "thumbnail": "https://res.cloudinary.com/dmj3zxwsb/image/upload/b_rgb:FFFFFF/c_pad,w_500,h_300/v1729651267/programing_hgasvx.png",
     "technologies": ["Node.js", "Express", "Back-end"],
     "price": 149.99,
     "isAvailable": true,
@@ -77,7 +77,7 @@
   {
     "title": "Python for Beginners",
     "description": "Learn the basics of Python programming and build simple applications.",
-    "thumbnail": "https://www.python.org/static/community_logos/python-logo.png",
+    "thumbnail": "https://res.cloudinary.com/dmj3zxwsb/image/upload/b_rgb:FFFFFF/c_pad,w_500,h_300/v1730080387/python_r546vl.png",
     "technologies": ["Python", "Back-end"],
     "price": 89.99,
     "isAvailable": true,
@@ -92,7 +92,7 @@
   {
     "title": "Angular Development Course",
     "description": "Master Angular to create dynamic web applications.",
-    "thumbnail": "https://angular.io/assets/images/logos/angular/angular.svg",
+    "thumbnail": "https://res.cloudinary.com/dmj3zxwsb/image/upload/b_rgb:FFFFFF/c_pad,w_500,h_300/v1730083551/Angular_full_color_logo.svg_sd1joj.png",
     "technologies": ["Angular", "Front-end"],
     "price": 139.99,
     "isAvailable": true,
@@ -107,7 +107,7 @@
   {
     "title": "Django Web Development",
     "description": "Build full-stack web applications with Django and Python.",
-    "thumbnail": "https://static.djangoproject.com/img/logos/django-logo-positive.png",
+    "thumbnail": "https://res.cloudinary.com/dmj3zxwsb/image/upload/b_rgb:FFFFFF/c_pad,w_500,h_300/v1730080091/django_ixvqe8.png",
     "technologies": ["Django", "Python", "Full-stack"],
     "price": 149.99,
     "isAvailable": true,
@@ -122,7 +122,7 @@
   {
     "title": "Vue.js Fundamentals",
     "description": "Learn how to build interactive user interfaces with Vue.js.",
-    "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/9/95/Vue.js_Logo_2.svg",
+    "thumbnail": "https://res.cloudinary.com/dmj3zxwsb/image/upload/b_rgb:FFFFFF/c_pad,w_500,h_300/v1730081777/Vue.js_Logo_2.svg_hnkl6m.png",
     "technologies": ["Vue.js", "Front-end"],
     "price": 109.99,
     "isAvailable": true,
@@ -137,7 +137,7 @@
   {
     "title": "Database Management with MySQL",
     "description": "Learn how to manage and query databases using MySQL.",
-    "thumbnail": "https://www.mysql.com/common/logos/logo-mysql-170x115.png",
+    "thumbnail": "https://res.cloudinary.com/dmj3zxwsb/image/upload/b_rgb:FFFFFF/c_pad,w_500,h_300/v1730079967/database_pkccs0.png",
     "technologies": ["MySQL", "Back-end"],
     "price": 129.99,
     "isAvailable": true,
@@ -152,7 +152,7 @@
   {
     "title": "Docker for DevOps",
     "description": "Learn how to use Docker to streamline development workflows.",
-    "thumbnail": "https://www.docker.com/wp-content/uploads/2022/03/Moby-logo.png",
+    "thumbnail": "https://res.cloudinary.com/dmj3zxwsb/image/upload/b_rgb:FFFFFF/c_pad,w_500,h_300/v1730081532/docker_jt0uf6.png",
     "technologies": ["Docker", "DevOps"],
     "price": 99.99,
     "isAvailable": true,

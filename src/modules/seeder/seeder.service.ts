@@ -14,7 +14,6 @@ export class SeederService extends PrismaClient implements OnModuleInit {
         where: { title: course.title },
       });
       if (dbCourse) {
-        this.logger.log(`Course ${dbCourse.title} was already created`);
         continue 
       }
       const savedCourse = await this.course.create({
@@ -37,5 +36,6 @@ export class SeederService extends PrismaClient implements OnModuleInit {
       })
       this.logger.log(`Course ${course.title} and its videos were created successfully`)
     }
+    this.logger.log(`seeder courses updated`)
   }
 }

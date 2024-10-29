@@ -112,8 +112,8 @@ export class OrderService extends PrismaClient implements OnModuleInit {
         },
       ],
       mode: 'payment',
-      success_url: `http://localhost:3000/api/users1`,
-      cancel_url: 'http://localhost:3000/api/users1',
+      success_url: `https://conso-learn.vercel.app/course/${dbCourse.id}/content`,
+      cancel_url: 'https://conso-learn.vercel.app/profile',
     });
 
     return session;

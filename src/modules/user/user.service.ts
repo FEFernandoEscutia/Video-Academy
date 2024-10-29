@@ -36,7 +36,7 @@ export class UserService extends PrismaClient implements OnModuleInit {
     await this.user.create({
       data:{
         name:aUser0.name,
-        email:aUser0.email,
+        email:aUser0.email.toLowerCase(),
         password: aUser0.password,
         phone:aUser0.phone,
         role:aUser0.role

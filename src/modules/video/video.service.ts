@@ -11,6 +11,19 @@ export class VideoService extends PrismaClient implements OnModuleInit {
     this.$connect();
     this.logger.log('Database Connected');
   }
+
+  async findByCourseId(courseId: string) {
+    const videos = await this.video.findMany({
+      where: { courseId },
+    });
+
+    if (videos.length === 0) {
+      throw new Error('Course not found.');
+    }
+
+    return videos;
+  }
+
   async create(createVideoDto: CreateVideoDto) {
     return this.video.create({
       data: createVideoDto,

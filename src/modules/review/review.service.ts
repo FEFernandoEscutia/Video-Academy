@@ -115,4 +115,45 @@ export class ReviewService extends PrismaClient implements OnModuleInit {
       },
     });
   }
+  async findTopReviews() {
+    const reviews = await this.review.findMany({
+      orderBy: {
+        rating: 'desc',
+      },
+      include: {
+        course: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    const uniqueReviews = [];
+    const courseIds = new Set();
+
+    for (const review of reviews) {
+      if (!courseIds.has(review.courseId)) {
+        uniqueReviews.push({
+          ...review,
+          user: { ...review.user, username: review.user.name, name: undefined },
+        });
+        courseIds.add(review.courseId);
+      }
+
+      if (uniqueReviews.length >= 6) {
+        break;
+      }
+    }
+
+    this.logger.log('uniqueReviews', uniqueReviews);
+    return uniqueReviews;
+  }
 }

@@ -22,6 +22,18 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 export class VideoController {
   constructor(private readonly videoService: VideoService) {}
 
+  @Get('course/:courseId')
+  @ApiOperation({ summary: 'Retrieve all videos for a given course ID' })
+  @ApiResponse({
+    status: 200,
+    description:
+      'List of videos for the specified course successfully retrieved.',
+  })
+  @ApiResponse({ status: 404, description: 'Course not found.' })
+  findByCourseId(@Param('courseId') courseId: string) {
+    return this.videoService.findByCourseId(courseId);
+  }
+
   @Post()
   @ApiOperation({ summary: 'Create a new video' })
   @ApiResponse({

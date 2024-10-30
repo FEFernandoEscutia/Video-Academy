@@ -40,7 +40,6 @@ export class CourseService extends PrismaClient implements OnModuleInit {
               thumbnail: result.url,
               technologies: techs,
             };
-          
 
             await this.course.create({ data: newCourse });
 

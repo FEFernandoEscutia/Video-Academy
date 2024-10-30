@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Logger,
   //UseGuards,
 } from '@nestjs/common';
 import { ReviewService } from './review.service';
@@ -20,6 +21,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 @ApiTags('Reviews')
 @Controller('review')
 export class ReviewController {
+  private readonly logger = new Logger('Review Service');
   constructor(private readonly reviewService: ReviewService) {}
 
   @Post()
@@ -32,6 +34,16 @@ export class ReviewController {
   //@UseGuards(AuthGuard)
   create(@Body() createReviewDto: CreateReviewDto) {
     return this.reviewService.create(createReviewDto);
+  }
+
+  @Get('top')
+  @ApiOperation({ summary: 'Retrieve the top 6 diverse reviews' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of top 6 reviews successfully retrieved.',
+  })
+  findTopReviews() {
+    return this.reviewService.findTopReviews();
   }
 
   @Get()

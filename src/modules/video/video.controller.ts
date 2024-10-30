@@ -23,12 +23,12 @@ import { Role } from '@prisma/client';
 
 
 @ApiTags('Videos')
-@ApiBearerAuth()
 @Controller('video')
 export class VideoController {
   constructor(private readonly videoService: VideoService) {}
 
   @Post(':id')
+  @ApiBearerAuth()
   @UseInterceptors(FileInterceptor('video'))
   @ApiOperation({ summary: 'Create a new video' })
   @ApiResponse({

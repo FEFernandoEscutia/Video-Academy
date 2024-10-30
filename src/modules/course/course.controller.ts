@@ -33,6 +33,7 @@ import {
   ApiTags,
   ApiConsumes,
   ApiBody,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { SpecialGuard } from 'src/guards/special.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -55,7 +56,8 @@ export class CourseController {
     description: 'Forbidden. Only Admins can create courses.',
   })
   @Post()
-  // @UseGuards(AuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard, RolesGuard)
   @UseInterceptors(FileInterceptor('image'))
   @ApiConsumes('multipart/form-data')
   @ApiBody({

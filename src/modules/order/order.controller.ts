@@ -15,7 +15,7 @@ import { AuthGuard } from 'src/guards/auth.guard';
 import { Roles } from 'src/decorators/role.decorator';
 import { Role } from '@prisma/client';
 import { Request, Response } from 'express';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('orders')
 @Controller('orders')
@@ -23,6 +23,7 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) {}
   //******************************************************************************************
   @Post()
+  @ApiBearerAuth()
   @UseGuards(AuthGuard)
   @Roles(Role.USER, Role.ADMIN)
   @ApiOperation({
@@ -35,6 +36,7 @@ export class OrderController {
   }
   //******************************************************************************************
   @Post('start-payment/:id')
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Create a Stripe payment session',
     description: `Starts a Stripe payment session for an unpaid order, including user and course details.`,
@@ -58,6 +60,7 @@ export class OrderController {
   }
   //******************************************************************************************
   @Get()
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Get user or all orders',
     description: `Retrieves the logged-in user's orders. Admins can retrieve all orders, while regular users only see their own.`,
@@ -72,6 +75,7 @@ export class OrderController {
 
   //******************************************************************************************
   @Get(':id')
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Get order by ID',
     description: `Retrieve the details of a specific order by its ID. Only accessible to admins.`,
@@ -83,6 +87,7 @@ export class OrderController {
   }
   //***************************************************************************************** */
   @Delete()
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Cancel Pending Order',
     description: `Endpoint is used to cancel an order that is still pending. it allows  to cancel orders that have not been completed.`,

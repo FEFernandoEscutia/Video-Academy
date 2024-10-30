@@ -7,6 +7,7 @@ import {
   Req,
   Query,
   BadRequestException,
+  Delete,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -40,7 +41,6 @@ export class OrderController {
   })
   @UseGuards(AuthGuard)
   paymentSession(@Param('id') orderId: string, @Req() req: any) {
-
     if (!orderId) {
       throw new BadRequestException('Please add an order to pay');
     }
@@ -79,7 +79,16 @@ export class OrderController {
   @UseGuards(AuthGuard)
   @Roles(Role.ADMIN)
   findOne(@Param('id') id: string) {
-
     return this.orderService.findOne(id);
+  }
+  //***************************************************************************************** */
+  @Delete()
+  @ApiOperation({
+    summary: 'Cancel Pending Order',
+    description: `Endpoint is used to cancel an order that is still pending. it allows  to cancel orders that have not been completed.`,
+  })
+  @UseGuards(AuthGuard)
+  async deletePendingOrder(@Param('id') id: string) {
+    return this.orderService.deletePendingOrder(id);
   }
 }

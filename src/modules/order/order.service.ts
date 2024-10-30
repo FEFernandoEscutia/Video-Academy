@@ -5,7 +5,6 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
 import { PrismaClient, Role } from '@prisma/client';
 import Stripe from 'stripe';
 import { envs } from 'src/config';
@@ -186,11 +185,13 @@ export class OrderService extends PrismaClient implements OnModuleInit {
         where: { userId: dbUser.id },
         include: {
           details: true,
-          course:true
+          course: true,
         },
       });
 
-    return await this.order.findMany({ include: { details: true, course:true} });
+    return await this.order.findMany({
+      include: { details: true, course: true },
+    });
   }
 
   async findOne(id: string) {
@@ -203,5 +204,10 @@ export class OrderService extends PrismaClient implements OnModuleInit {
       throw new BadRequestException('Order not found');
     }
     return dbOrder;
+  }
+  //*****************************************************************
+  async deletePendingOrder(id: string) {
+    await this.order.delete({ where: { id, status: false } });
+    return { message: `Order has been cancelled correctly` };
   }
 }

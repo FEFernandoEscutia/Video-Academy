@@ -17,7 +17,7 @@ COPY . .
 RUN npx prisma generate
 
 # Expone la aplicación en el puerto 3000
-EXPOSE 8080
+EXPOSE 3000
 
 # Comando para iniciar la aplicación
 CMD ["npm", "run", "start:dev"]

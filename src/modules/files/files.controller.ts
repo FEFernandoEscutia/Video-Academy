@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Controller,
   FileTypeValidator,
   MaxFileSizeValidator,
@@ -21,7 +22,9 @@ import { AuthGuard } from 'src/guards/auth.guard';
 @ApiTags('files')
 @Controller('files')
 export class FilesController {
-  constructor(private readonly filesService: FilesService) {}
+  constructor(private readonly filesService: FilesService) {
+    
+  }
 
   @Post('user:id')
   @UseGuards(AuthGuard, RolesGuard)
@@ -67,4 +70,21 @@ export class FilesController {
       this.filesService.uploadFileUsingId(id, file);
     }
   }
+
+  @Post('GoogleUpload')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('File is required');
+    }
+
+    try {
+      const publicUrl = await this.filesService.uploadGoogleFiles(file);
+    
+      return { url: publicUrl };
+    } catch (error) {
+      throw new BadRequestException('Failed to upload file');
+    }
+  }
 }
+

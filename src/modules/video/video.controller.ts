@@ -6,12 +6,20 @@ import {
   Patch,
   Param,
   Delete,
+  UseInterceptors,
+  UploadedFile,
+  UseGuards,
   //UseGuards,
 } from '@nestjs/common';
 import { VideoService } from './video.service';
 import { CreateVideoDto } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { AuthGuard } from 'src/guards/auth.guard';
+import { RolesGuard } from 'src/guards/roles.guard';
+import { Roles } from 'src/decorators/role.decorator';
+import { Role } from '@prisma/client';
 //import { AuthGuard } from '@nestjs/passport';
 //import { RolesGuard } from 'src/guards/roles.guard';
 //import { Roles } from 'src/decorators/role.decorator';
@@ -22,17 +30,22 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 export class VideoController {
   constructor(private readonly videoService: VideoService) {}
 
-  @Post()
+  @Post(':id')
+  @UseInterceptors(FileInterceptor('video'))
   @ApiOperation({ summary: 'Create a new video' })
   @ApiResponse({
     status: 201,
     description: 'The video has been successfully created.',
   })
   @ApiResponse({ status: 400, description: 'Invalid data provided.' })
-  //@UseGuards(AuthGuard, RolesGuard)
-  //@Roles(Role.ADMIN)
-  create(@Body() createVideoDto: CreateVideoDto) {
-    return this.videoService.create(createVideoDto);
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  create(
+    @Body() createVideoDto: CreateVideoDto,
+    @UploadedFile() file: Express.Multer.File,
+    @Param('id') id: string,
+  ) {
+    return this.videoService.create(createVideoDto, file, id);
   }
 
   @Get()

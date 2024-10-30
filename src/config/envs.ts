@@ -9,6 +9,9 @@ interface EnvVars {
   ADMIN0_PHONE: string;
   JWT_SECRET: string;
   STRIPE_SECRET: string
+  GOOGLE_CLOUD_PROJECT_ID: string;
+  GOOGLE_CLOUD_CLIENT_EMAIL: string;
+  GOOGLE_CLOUD_PRIVATE_KEY: string;
 }
 
 const envSchema = joi
@@ -19,7 +22,10 @@ const envSchema = joi
     ADMIN0_EMAIL: joi.string().required(),
     ADMIN0_PHONE: joi.string().required(),
     JWT_SECRET: joi.string().required(),
-    STRIPE_SECRET: joi.string().required()
+    STRIPE_SECRET: joi.string().required(),
+    GOOGLE_CLOUD_PROJECT_ID: joi.string().required(),
+    GOOGLE_CLOUD_CLIENT_EMAIL: joi.string().required(),
+    GOOGLE_CLOUD_PRIVATE_KEY: joi.string().required(),
   })
   .unknown(true);
 
@@ -38,5 +44,8 @@ export const envs = {
   Admin0Email: envVars.ADMIN0_EMAIL,
   Admin0phone: envVars.ADMIN0_PHONE,
   jwtSecret: envVars.JWT_SECRET,
-  stripeSecret: envVars.STRIPE_SECRET
+  stripeSecret: envVars.STRIPE_SECRET,
+  googleCloudProjectId: envVars.GOOGLE_CLOUD_PROJECT_ID,
+  googleCloudClientEmail: envVars.GOOGLE_CLOUD_CLIENT_EMAIL,
+  googleCloudPrivateKey: envVars.GOOGLE_CLOUD_PRIVATE_KEY.replace(/\\n/g, '\n'),
 };

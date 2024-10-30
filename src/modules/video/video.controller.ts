@@ -14,18 +14,16 @@ import {
 import { VideoService } from './video.service';
 import { CreateVideoDto } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { Roles } from 'src/decorators/role.decorator';
 import { Role } from '@prisma/client';
-//import { AuthGuard } from '@nestjs/passport';
-//import { RolesGuard } from 'src/guards/roles.guard';
-//import { Roles } from 'src/decorators/role.decorator';
-//import { Role } from '@prisma/client';
+
 
 @ApiTags('Videos')
+@ApiBearerAuth()
 @Controller('video')
 export class VideoController {
   constructor(private readonly videoService: VideoService) {}

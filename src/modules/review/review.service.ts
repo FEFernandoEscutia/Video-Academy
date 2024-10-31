@@ -54,7 +54,7 @@ export class ReviewService extends PrismaClient implements OnModuleInit {
 
     return {
       review: createdReview,
-      message: `¡Gracias por compartir tu experiencia! Tu opinión sobre ${createdReview.course.title} nos ayuda a mejorar.`,
+      message: `Thank you for sharing your experience! Your feedback on ${createdReview.course.title} helps us improve.`,
     };
   }
 

@@ -7,33 +7,45 @@ import {
   Param,
   Delete,
   Logger,
-  //UseGuards,
+  Req,
+  UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ReviewService } from './review.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-//import { Roles } from 'src/decorators/role.decorator';
-//import { AuthGuard } from '@nestjs/passport';
-//import { Role } from '@prisma/client';
-//import { RolesGuard } from 'src/guards/roles.guard';
+import { AuthGuard } from '../../guards/auth.guard';
+import { JwtService } from '@nestjs/jwt';
 
 @ApiTags('Reviews')
 @Controller('review')
 export class ReviewController {
   private readonly logger = new Logger('Review Service');
-  constructor(private readonly reviewService: ReviewService) {}
+  constructor(
+    private readonly reviewService: ReviewService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   @Post()
+  @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Create a new review' })
   @ApiResponse({
     status: 201,
     description: 'The review has been successfully created.',
   })
   @ApiResponse({ status: 400, description: 'Invalid data provided.' })
-  //@UseGuards(AuthGuard)
-  create(@Body() createReviewDto: CreateReviewDto) {
-    return this.reviewService.create(createReviewDto);
+  create(
+    @Body() createReviewDto: CreateReviewDto,
+    @Req() req,
+    @Query('courseId') courseId: string,
+  ) {
+    const userId = req.user.id;
+    return this.reviewService.create({
+      ...createReviewDto,
+      userId,
+      courseId,
+    });
   }
 
   @Get('top')
@@ -54,7 +66,6 @@ export class ReviewController {
     status: 200,
     description: 'List of reviews successfully retrieved.',
   })
-  //@UseGuards(AuthGuard)
   findAll() {
     return this.reviewService.findAll();
   }
@@ -79,8 +90,6 @@ export class ReviewController {
     description: 'Review successfully updated.',
   })
   @ApiResponse({ status: 404, description: 'Review not found.' })
-  //@UseGuards(AuthGuard, RolesGuard)
-  //@Roles(Role.ADMIN)
   update(@Param('id') id: string, @Body() updateReviewDto: UpdateReviewDto) {
     return this.reviewService.update(id, updateReviewDto);
   }
@@ -92,8 +101,6 @@ export class ReviewController {
     description: 'Review successfully deleted.',
   })
   @ApiResponse({ status: 404, description: 'Review not found.' })
-  //@UseGuards(AuthGuard, RolesGuard)
-  // @Roles(Role.ADMIN)
   remove(@Param('id') id: string) {
     return this.reviewService.remove(id);
   }

@@ -57,7 +57,7 @@ export class ReviewService extends PrismaClient implements OnModuleInit {
       message: `Thank you for sharing your experience! Your feedback on ${createdReview.course.title} helps us improve.`,
     };
   }
-
+//Borrame
   async findAll() {
     return this.review.findMany({
       include: {

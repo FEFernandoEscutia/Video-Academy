@@ -1,0 +1,167 @@
+[
+  {
+    "title": "Basic Web Development Course",
+    "description": "Learn the fundamentals of HTML and CSS to create static websites.",
+    "thumbnail": "https://res.cloudinary.com/dmj3zxwsb/image/upload/b_rgb:FFFFFF/c_pad,w_500,h_300/v1730079988/css3-html5-e1383236383597_qxiww5.png",
+    "technologies": ["HTML", "CSS", "Front-end"],
+    "price": 99.99,
+    "isAvailable": true,
+    "videos": [
+      {
+        "title": "Introduction to HTML and CSS",
+        "description": "Learn the basics of web development using HTML and CSS.",
+        "url": "https://www.youtube.com/watch?v=XqFR2lqBYPs&ab_channel=freeCodeCampEspa%C3%B1ol"
+      }
+    ]
+  },
+  {
+    "title": "React Development Course",
+    "description": "Learn to build interactive user interfaces with React.",
+    "thumbnail": "https://res.cloudinary.com/dmj3zxwsb/image/upload/b_rgb:FFFFFF/c_pad,w_500,h_300/v1729649721/structure_1_ulug1g.png",
+    "technologies": ["React", "Front-end"],
+    "price": 129.99,
+    "isAvailable": true,
+    "videos": [
+      {
+        "title": "Getting Started with React",
+        "description": "Introduction to using components in React.",
+        "url": "https://www.youtube.com/watch?v=6Jfk8ic3KVk&ab_channel=freeCodeCampEspa%C3%B1ol"
+      }
+    ]
+  },
+  {
+    "title": "Tailwind CSS Course",
+    "description": "Learn how to build modern and responsive web designs using Tailwind CSS.",
+    "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/d/d5/Tailwind_CSS_Logo.svg",
+    "technologies": ["Tailwind", "Front-end"],
+    "price": 99.99,
+    "isAvailable": true,
+    "videos": [
+      {
+        "title": "Introduction to Tailwind CSS",
+        "description": "Get started with Tailwind CSS for building modern web designs.",
+        "url": "https://www.youtube.com/watch?v=5HtRcMSO1Ro&ab_channel=freeCodeCampEspa%C3%B1ol"
+      }
+    ]
+  },
+  {
+    "title": "TypeScript Course",
+    "description": "Learn how to build robust applications using TypeScript.",
+    "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Typescript_logo_2020.svg/800px-Typescript_logo_2020.svg.png",
+    "technologies": ["TypeScript", "Full-stack"],
+    "price": 119.99,
+    "isAvailable": true,
+    "videos": [
+      {
+        "title": "Introduction to TypeScript",
+        "description": "Learn the basics of TypeScript and how to integrate it into your projects.",
+        "url": "https://www.youtube.com/watch?v=T7uaEZ3ZoZE&ab_channel=freeCodeCampEspa%C3%B1ol"
+      }
+    ]
+  },
+  {
+    "title": "APIs with Node.js and Express",
+    "description": "Learn how to build powerful APIs using Node.js and Express.",
+    "thumbnail": "https://res.cloudinary.com/dmj3zxwsb/image/upload/b_rgb:FFFFFF/c_pad,w_500,h_300/v1729651267/programing_hgasvx.png",
+    "technologies": ["Node.js", "Express", "Back-end"],
+    "price": 149.99,
+    "isAvailable": true,
+    "videos": [
+      {
+        "title": "Introduction to APIs with Node.js and Express",
+        "description": "Learn how to set up and build APIs using Node.js and Express.",
+        "url": "https://www.youtube.com/watch?v=yd_QpXWrbtQ&ab_channel=freeCodeCampEspa%C3%B1ol"
+      }
+    ]
+  },
+  {
+    "title": "Python for Beginners",
+    "description": "Learn the basics of Python programming and build simple applications.",
+    "thumbnail": "https://res.cloudinary.com/dmj3zxwsb/image/upload/b_rgb:FFFFFF/c_pad,w_500,h_300/v1730080387/python_r546vl.png",
+    "technologies": ["Python", "Back-end"],
+    "price": 89.99,
+    "isAvailable": true,
+    "videos": [
+      {
+        "title": "Introduction to Python",
+        "description": "Get started with Python programming from scratch.",
+        "url": "https://www.youtube.com/watch?v=_uQrJ0TkZlc&ab_channel=ProgrammingwithMosh"
+      }
+    ]
+  },
+  {
+    "title": "Angular Development Course",
+    "description": "Master Angular to create dynamic web applications.",
+    "thumbnail": "https://res.cloudinary.com/dmj3zxwsb/image/upload/b_rgb:FFFFFF/c_pad,w_500,h_300/v1730083551/Angular_full_color_logo.svg_sd1joj.png",
+    "technologies": ["Angular", "Front-end"],
+    "price": 139.99,
+    "isAvailable": true,
+    "videos": [
+      {
+        "title": "Getting Started with Angular",
+        "description": "An introduction to building applications with Angular.",
+        "url": "https://www.youtube.com/watch?v=3qBXWUpoPHo&ab_channel=Academind"
+      }
+    ]
+  },
+  {
+    "title": "Django Web Development",
+    "description": "Build full-stack web applications with Django and Python.",
+    "thumbnail": "https://res.cloudinary.com/dmj3zxwsb/image/upload/b_rgb:FFFFFF/c_pad,w_500,h_300/v1730080091/django_ixvqe8.png",
+    "technologies": ["Django", "Python", "Full-stack"],
+    "price": 149.99,
+    "isAvailable": true,
+    "videos": [
+      {
+        "title": "Introduction to Django",
+        "description": "Learn the fundamentals of Django to create robust web apps.",
+        "url": "https://www.youtube.com/watch?v=F5mRW0jo-U4&ab_channel=ProgrammingwithMosh"
+      }
+    ]
+  },
+  {
+    "title": "Vue.js Fundamentals",
+    "description": "Learn how to build interactive user interfaces with Vue.js.",
+    "thumbnail": "https://res.cloudinary.com/dmj3zxwsb/image/upload/b_rgb:FFFFFF/c_pad,w_500,h_300/v1730081777/Vue.js_Logo_2.svg_hnkl6m.png",
+    "technologies": ["Vue.js", "Front-end"],
+    "price": 109.99,
+    "isAvailable": true,
+    "videos": [
+      {
+        "title": "Getting Started with Vue.js",
+        "description": "An introductory course to building apps with Vue.js.",
+        "url": "https://www.youtube.com/watch?v=FXpIoQ_rT_c&ab_channel=Academind"
+      }
+    ]
+  },
+  {
+    "title": "Database Management with MySQL",
+    "description": "Learn how to manage and query databases using MySQL.",
+    "thumbnail": "https://res.cloudinary.com/dmj3zxwsb/image/upload/b_rgb:FFFFFF/c_pad,w_500,h_300/v1730079967/database_pkccs0.png",
+    "technologies": ["MySQL", "Back-end"],
+    "price": 129.99,
+    "isAvailable": true,
+    "videos": [
+      {
+        "title": "Introduction to MySQL",
+        "description": "Master the basics of MySQL for database management.",
+        "url": "https://www.youtube.com/watch?v=7S_tz1z_5bA&ab_channel=TheNetNinja"
+      }
+    ]
+  },
+  {
+    "title": "Docker for DevOps",
+    "description": "Learn how to use Docker to streamline development workflows.",
+    "thumbnail": "https://res.cloudinary.com/dmj3zxwsb/image/upload/b_rgb:FFFFFF/c_pad,w_500,h_300/v1730081532/docker_jt0uf6.png",
+    "technologies": ["Docker", "DevOps"],
+    "price": 99.99,
+    "isAvailable": true,
+    "videos": [
+      {
+        "title": "Introduction to Docker",
+        "description": "Learn how to containerize applications using Docker.",
+        "url": "https://www.youtube.com/watch?v=fqMOX6JJhGo&ab_channel=TechWorldwithNana"
+      }
+    ]
+  }
+]

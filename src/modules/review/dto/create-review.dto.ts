@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsInt, IsIn, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsString, IsInt, IsIn } from 'class-validator';
 
 export class CreateReviewDto {
   @ApiProperty({
@@ -9,22 +9,6 @@ export class CreateReviewDto {
   @IsNotEmpty()
   @IsString()
   content: string;
-
-  @ApiProperty({
-    description: 'ID of the course being reviewed',
-    example: 'abc123',
-  })
-  @IsNotEmpty()
-  @IsUUID()
-  courseId: string;
-
-  @ApiProperty({
-    description: 'ID of the user who is writing the review',
-    example: 'user789',
-  })
-  @IsNotEmpty()
-  @IsUUID()
-  userId: string;
 
   @ApiProperty({
     description: 'Rating given by the user, from 1 to 5',

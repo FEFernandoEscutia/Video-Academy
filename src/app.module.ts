@@ -11,9 +11,6 @@ import { cloudinaryConfig, envs } from './config';
 import { SeederModule } from './modules/seeder/seeder.module';
 import { FilesModule } from './modules/files/files.module';
 
-
-
-
 @Module({
   imports: [
     UserModule,
@@ -28,7 +25,7 @@ import { FilesModule } from './modules/files/files.module';
       secret: envs.jwtSecret,
     }),
     SeederModule,
-    FilesModule
+    FilesModule,
   ],
   controllers: [],
   providers: [cloudinaryConfig],

@@ -1,4 +1,9 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  OnModuleInit,
+} from '@nestjs/common';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { PrismaClient } from '@prisma/client';
@@ -10,9 +15,21 @@ export class ReviewService extends PrismaClient implements OnModuleInit {
     this.$connect();
     this.logger.log('Database Connected');
   }
-  async create(createReviewDto: CreateReviewDto) {
-    const { content, courseId, userId, rating } = createReviewDto;
-    return this.review.create({
+
+  async create(
+    createReviewData: CreateReviewDto & { userId: string; courseId: string },
+  ) {
+    const { content, courseId, userId, rating } = createReviewData;
+
+    const courseExists = await this.course.findUnique({
+      where: { id: courseId },
+    });
+
+    if (!courseExists) {
+      throw new BadRequestException('Course not found');
+    }
+
+    const createdReview = await this.review.create({
       data: {
         content,
         courseId,
@@ -34,6 +51,11 @@ export class ReviewService extends PrismaClient implements OnModuleInit {
         },
       },
     });
+
+    return {
+      review: createdReview,
+      message: `Thank you for sharing your experience! Your feedback on ${createdReview.course.title} helps us improve.`,
+    };
   }
 
   async findAll() {

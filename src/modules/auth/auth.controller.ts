@@ -4,9 +4,6 @@ import { AuthDto } from './dto/auth.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthInterceptor } from 'src/interceptors/auth.interceptor';
 
-
-
-
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {

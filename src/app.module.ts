@@ -30,5 +30,4 @@ import { FilesModule } from './modules/files/files.module';
   controllers: [],
   providers: [cloudinaryConfig],
 })
-//* */
 export class AppModule {}

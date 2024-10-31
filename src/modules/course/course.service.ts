@@ -188,6 +188,9 @@ export class CourseService extends PrismaClient implements OnModuleInit {
         isAvailable: true,
         id: id,
       },
+      include: {
+        videos: true,
+      },
     });
   }
 

@@ -40,6 +40,8 @@ export class ReviewController {
     @Req() req,
     @Query('courseId') courseId: string,
   ) {
+    console.log('Req(): ' + req);
+    console.log('Req()userID: ' + req.user.id);
     const userId = req.user.id;
     return this.reviewService.create({
       ...createReviewDto,

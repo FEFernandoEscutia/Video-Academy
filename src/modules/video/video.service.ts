@@ -43,10 +43,15 @@ export class VideoService extends PrismaClient implements OnModuleInit {
     const bucket = this.storage.bucket(this.bucketName);
     const destination = `uploads/${Date.now()}-${file.originalname}`;
     const cloudFile = bucket.file(destination);
-    await cloudFile.save(file.buffer, {
-      contentType: file.mimetype,
-      resumable: false,
-    });
+    try {
+      await cloudFile.save(file.buffer, {
+        contentType: file.mimetype,
+        resumable: false,
+      });
+    } catch (error) {
+      console.log(error);
+      
+    }
     const publicUrl = `https://storage.googleapis.com/${cloudFile.bucket.name}/${encodeURIComponent(cloudFile.name)}`;
     await this.video.create({
       data: {

@@ -33,4 +33,8 @@ export class CourseFilterDto {
   @Transform(({ value }) => value === 'true' || value === true)
   isfree?: boolean;
 
+  @IsOptional()
+  @IsString()
+  sortBy?: 'users' | 'reviews' | 'rating';
+
 }

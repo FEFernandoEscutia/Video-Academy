@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   Logger,
+  NotFoundException,
   OnModuleInit,
 } from '@nestjs/common';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -211,5 +212,27 @@ export class ReviewService extends PrismaClient implements OnModuleInit {
 
     this.logger.log('uniqueReviews', uniqueReviews);
     return uniqueReviews;
+  }
+
+  async findAllWithCourseId(id: string) {
+    const dbCourse = await this.course.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!dbCourse) {
+      throw new NotFoundException('Course does not exist');
+    }
+
+    return await this.review.findMany({
+      where: {
+        courseId: dbCourse.id,
+      },
+      include:{
+        course:true,
+        user:true
+      }
+    });
   }
 }

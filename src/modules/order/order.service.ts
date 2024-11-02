@@ -1,7 +1,9 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   Logger,
+  NotFoundException,
   OnModuleInit,
 } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -202,6 +204,7 @@ export class OrderService extends PrismaClient implements OnModuleInit {
       return await this.order.findMany({
         include: {
           user: true,
+          course:true
         },
       });
     }
@@ -212,6 +215,7 @@ export class OrderService extends PrismaClient implements OnModuleInit {
         },
         include: {
           user: true,
+          course:true
         },
       });
     }
@@ -222,6 +226,7 @@ export class OrderService extends PrismaClient implements OnModuleInit {
         },
         include: {
           user: true,
+          course:true
         },
       });
     }
@@ -232,6 +237,9 @@ export class OrderService extends PrismaClient implements OnModuleInit {
       where: {
         id,
       },
+      include: {
+        user: true,
+      },
     });
     if (!dbOrder) {
       throw new BadRequestException('Order not found');
@@ -239,8 +247,24 @@ export class OrderService extends PrismaClient implements OnModuleInit {
     return dbOrder;
   }
   //*****************************************************************
-  async deletePendingOrder(id: string) {
-    await this.order.delete({ where: { id, status: false } });
+  async deletePendingOrder(id: string, loggedUserId: string) {
+    const dbOrder = await this.order.findUnique({
+      where: { id },
+    });
+    if (!dbOrder) {
+      throw new NotFoundException(`Order with ID ${id} not found`);
+    }
+    if (dbOrder.userId !== loggedUserId) {
+      throw new ForbiddenException(
+        `You are not authorized to cancel this order`,
+      );
+    }
+    if (dbOrder.status) {
+      throw new BadRequestException(
+        `Order with ID ${id} has already been completed`,
+      );
+    }
+    await this.order.delete({ where: { id } });
     return { message: `Order has been cancelled correctly` };
   }
 }

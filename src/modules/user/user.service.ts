@@ -20,12 +20,12 @@ export class UserService extends PrismaClient implements OnModuleInit {
     this.$connect();
     this.logger.log('Database Connected');
     const hashPassword = await bcrypt.hash(envs.Admin0Password, 10);
-    const aUser0:UpdateUserDto = {
+    const aUser0: UpdateUserDto = {
       name: envs.Admin0Name,
       email: envs.Admin0Email,
       password: hashPassword,
       phone: envs.Admin0phone,
-      role: Role.ADMIN
+      role: Role.ADMIN,
     };
     const dbUser = await this.user.findFirst({
       where: { email: aUser0.email },
@@ -34,14 +34,14 @@ export class UserService extends PrismaClient implements OnModuleInit {
       return this.logger.log('Admin0 was found');
     }
     await this.user.create({
-      data:{
-        name:aUser0.name,
-        email:aUser0.email.toLowerCase(),
+      data: {
+        name: aUser0.name,
+        email: aUser0.email.toLowerCase(),
         password: aUser0.password,
-        phone:aUser0.phone,
-        role:aUser0.role
-      }
-    })
+        phone: aUser0.phone,
+        role: aUser0.role,
+      },
+    });
     this.logger.log('Admin0 was created successfully');
   }
 
@@ -67,8 +67,13 @@ export class UserService extends PrismaClient implements OnModuleInit {
   //****************************************************************************************************
 
   async findAll(paginationDto: PaginationDto) {
-    const { page, limit } = paginationDto;
-    const totalPages = await this.user.count({});
+    const { page, limit, name, email } = paginationDto;
+    const totalPages = await this.user.count({
+      where: {
+        ...(name && { name: { contains: name, mode: 'insensitive' } }),
+        ...(email && { email: { contains: email, mode: 'insensitive' } }),
+      },
+    });
     const lastPage = Math.ceil(totalPages / limit);
     if (page > lastPage) {
       throw new BadRequestException(
@@ -79,15 +84,18 @@ export class UserService extends PrismaClient implements OnModuleInit {
       data: await this.user.findMany({
         skip: (page - 1) * limit,
         take: limit,
-        include:{
-          orders:true,
-          courses:true
-        }
+        where: {
+          ...(name && { name: { contains: name, mode: 'insensitive' } }),
+          ...(email && { email: { contains: email, mode: 'insensitive' } }),
+        },
+        include: {
+          orders: true,
+          courses: true,
+        },
       }),
       metaData: {
         page: page,
         total: totalPages,
-        UsersShown: limit,
         lastPage: lastPage,
       },
     };

@@ -110,6 +110,7 @@ export class CourseService extends PrismaClient implements OnModuleInit {
     }
   }
 
+
   async searchCourses(keyword: string) {
     const lowerKeyword = keyword.toLowerCase();
 
@@ -143,6 +144,53 @@ export class CourseService extends PrismaClient implements OnModuleInit {
     return dbUser.courses;
   }
   //******************************
+  async findTopCourses(filterDto: CourseFilterDto) {
+    const { sortBy } = filterDto;
+
+    let orderByCondition;
+
+    // Determina la lógica de ordenación según el criterio recibido
+    switch (sortBy) {
+        case 'users':
+            orderByCondition = [{ users: { _count: 'desc' } }];
+            break;
+        case 'reviews':
+            orderByCondition = [{ reviews: { _count: 'desc' } }];
+            break;
+        case 'rating':
+            orderByCondition = [{ rating: 'desc' }];
+            break;
+        default:
+            orderByCondition = [{ users: { _count: 'desc' } }]; 
+            break;
+    }
+
+    // Busca los cursos con el criterio de ordenamiento
+    const topCourses = await this.course.findMany({
+        where: { isAvailable: true },
+        include: {
+          users: true,
+          reviews: true,
+        },
+        orderBy: orderByCondition,
+    });
+
+    // Mapea los resultados para incluir solo la información necesaria
+    return topCourses.map(course => ({
+        id: course.id,
+        title: course.title,
+        userCount: course.users.length,
+        thumbnail: course.thumbnail,
+        price: course.price,
+        averageRating: course.rating,
+        reviewCount: course.reviews.length
+    }));
+}
+
+
+
+//************************************* */
+
   async findCourseAvailable(): Promise<Course[]> {
     return await this.course.findMany({
       where: {
@@ -153,6 +201,9 @@ export class CourseService extends PrismaClient implements OnModuleInit {
       },
     });
   }
+
+
+
 
   async findCoursePopular(): Promise<Course[]> {
     return await this.course.findMany({ orderBy: {} });

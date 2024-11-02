@@ -10,6 +10,7 @@ import Stripe from 'stripe';
 import { envs } from 'src/config';
 import { Request, Response } from 'express';
 import { UUID } from 'crypto';
+import { StatusDto } from './dto/status.dto';
 
 @Injectable()
 export class OrderService extends PrismaClient implements OnModuleInit {
@@ -193,7 +194,39 @@ export class OrderService extends PrismaClient implements OnModuleInit {
       include: { details: true, course: true },
     });
   }
+  //*********************************************************************************************
+  async adminFindAll(statusDto: StatusDto) {
+    const { paid } = statusDto;
 
+    if (!paid) {
+      return await this.order.findMany({
+        include: {
+          user: true,
+        },
+      });
+    }
+    if (paid === 'true') {
+      return await this.order.findMany({
+        where: {
+          status: true,
+        },
+        include: {
+          user: true,
+        },
+      });
+    }
+    if (paid === 'false') {
+      return await this.order.findMany({
+        where: {
+          status: false,
+        },
+        include: {
+          user: true,
+        },
+      });
+    }
+  }
+  //*********************************************************************************************
   async findOne(id: string) {
     const dbOrder = await this.order.findFirst({
       where: {

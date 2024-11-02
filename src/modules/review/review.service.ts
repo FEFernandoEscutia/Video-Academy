@@ -57,8 +57,8 @@ export class ReviewService extends PrismaClient implements OnModuleInit {
       message: `Thank you for sharing your experience! Your feedback on ${createdReview.course.title} helps us improve.`,
     };
   }
-//Borrame
-  async findAll() {
+
+  /* async findAll() {
     return this.review.findMany({
       include: {
         course: {
@@ -75,6 +75,26 @@ export class ReviewService extends PrismaClient implements OnModuleInit {
         },
       },
     });
+  } */
+
+  async findAll() {
+    const reviews = await this.review.findMany({
+      include: {
+        course: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+    return reviews.reverse();
   }
 
   async findOne(id: string) {
@@ -137,6 +157,7 @@ export class ReviewService extends PrismaClient implements OnModuleInit {
       },
     });
   }
+
   async findTopReviews() {
     const reviews = await this.review.findMany({
       orderBy: {

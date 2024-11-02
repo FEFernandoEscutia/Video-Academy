@@ -3,6 +3,7 @@ import { ReviewService } from './review.service';
 import { ReviewController } from './review.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { envs } from 'src/config';
+import { ContentFilterService } from '../../services/content-filter.service';
 
 @Module({
   imports: [
@@ -12,6 +13,6 @@ import { envs } from 'src/config';
     }),
   ],
   controllers: [ReviewController],
-  providers: [ReviewService],
+  providers: [ReviewService, ContentFilterService],
 })
 export class ReviewModule {}

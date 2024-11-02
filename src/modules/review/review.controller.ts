@@ -17,7 +17,9 @@ import { UpdateReviewDto } from './dto/update-review.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '../../guards/auth.guard';
 import { JwtService } from '@nestjs/jwt';
-import { RolesGuard } from 'src/guards/roles.guard';
+
+import { ContentFilterService } from '../../services/content-filter.service';
+
 
 @ApiTags('Reviews')
 @Controller('review')
@@ -26,6 +28,7 @@ export class ReviewController {
   constructor(
     private readonly reviewService: ReviewService,
     private readonly jwtService: JwtService,
+    private readonly contentFilterService: ContentFilterService,
   ) {}
 
   @Post()
@@ -41,7 +44,10 @@ export class ReviewController {
     @Req() req:any,
     @Query('courseId') courseId: string,
   ) {
+    console.log('Req(): ' + req);
+    console.log('Req()userID: ' + req.user.id);
     const userId = req.user.id;
+    this.contentFilterService.validateContent(createReviewDto.content);
     return this.reviewService.create({
       ...createReviewDto,
       userId,

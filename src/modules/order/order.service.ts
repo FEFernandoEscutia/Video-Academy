@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   Injectable,
   Logger,
+  NotFoundException,
   OnModuleInit,
 } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -247,6 +248,9 @@ export class OrderService extends PrismaClient implements OnModuleInit {
     const dbOrder = await this.order.findUnique({
       where: { id },
     });
+    if (!dbOrder) {
+      throw new NotFoundException(`Order with ID ${id} not found`);
+    }
     if (dbOrder.userId !== loggedUserId) {
       throw new ForbiddenException(
         `You are not authorized to cancel this order`,

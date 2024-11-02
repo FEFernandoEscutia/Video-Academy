@@ -53,7 +53,6 @@ export class FilesService extends PrismaClient implements OnModuleInit {
               .then(() => resolve(result))
               .catch(reject);
 
-            resolve(result);
           }
         },
       );

@@ -107,7 +107,7 @@ export class ReviewController {
     status: 200,
     description: 'Review successfully deleted.',
   })
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard)
   @ApiResponse({ status: 404, description: 'Review not found.' })
   remove(@Param('id') id: string) {
     return this.reviewService.remove(id);

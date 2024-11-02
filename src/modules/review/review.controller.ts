@@ -10,6 +10,8 @@ import {
   Req,
   UseGuards,
   Query,
+  ParseUUIDPipe,
+  BadRequestException,
 } from '@nestjs/common';
 import { ReviewService } from './review.service';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -19,7 +21,6 @@ import { AuthGuard } from '../../guards/auth.guard';
 import { JwtService } from '@nestjs/jwt';
 
 import { ContentFilterService } from '../../services/content-filter.service';
-
 
 @ApiTags('Reviews')
 @Controller('review')
@@ -41,7 +42,7 @@ export class ReviewController {
   @ApiResponse({ status: 400, description: 'Invalid data provided.' })
   create(
     @Body() createReviewDto: CreateReviewDto,
-    @Req() req:any,
+    @Req() req: any,
     @Query('courseId') courseId: string,
   ) {
     console.log('Req(): ' + req);
@@ -111,5 +112,21 @@ export class ReviewController {
   @ApiResponse({ status: 404, description: 'Review not found.' })
   remove(@Param('id') id: string) {
     return this.reviewService.remove(id);
+  }
+
+  @Get('course/:id')
+  @ApiOperation({
+    summary: 'Retrieve a review using the course ID',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Review successfully retrieved.',
+  })
+  @ApiResponse({ status: 404, description: 'Review not found.' })
+  getAllReviewsWithCourseId(@Param('id', ParseUUIDPipe) id: string) {
+    if (!id) {
+      throw new BadRequestException('Please provide a valid Id');
+    }
+    return this.reviewService.findAllWithCourseId(id);
   }
 }

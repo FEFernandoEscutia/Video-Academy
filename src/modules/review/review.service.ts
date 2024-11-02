@@ -182,11 +182,24 @@ export class ReviewService extends PrismaClient implements OnModuleInit {
     const uniqueReviews = [];
     const courseIds = new Set();
 
-    for (const review of reviews) {
+    /* for (const review of reviews) {
       if (!courseIds.has(review.courseId)) {
         uniqueReviews.push({
           ...review,
           user: { ...review.user, username: review.user.name, name: undefined },
+        });
+        courseIds.add(review.courseId);
+      }
+
+      if (uniqueReviews.length >= 6) {
+        break;
+      }
+    } */
+
+    for (const review of reviews) {
+      if (!courseIds.has(review.courseId)) {
+        uniqueReviews.push({
+          ...review,
         });
         courseIds.add(review.courseId);
       }

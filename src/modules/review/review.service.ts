@@ -216,6 +216,10 @@ export class ReviewService extends PrismaClient implements OnModuleInit {
       where: {
         courseId: dbCourse.id,
       },
+      include:{
+        course:true,
+        user:true
+      }
     });
   }
 }

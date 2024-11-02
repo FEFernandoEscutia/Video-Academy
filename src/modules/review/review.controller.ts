@@ -17,7 +17,9 @@ import { UpdateReviewDto } from './dto/update-review.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '../../guards/auth.guard';
 import { JwtService } from '@nestjs/jwt';
+
 import { ContentFilterService } from '../../services/content-filter.service';
+
 
 @ApiTags('Reviews')
 @Controller('review')
@@ -39,7 +41,7 @@ export class ReviewController {
   @ApiResponse({ status: 400, description: 'Invalid data provided.' })
   create(
     @Body() createReviewDto: CreateReviewDto,
-    @Req() req,
+    @Req() req:any,
     @Query('courseId') courseId: string,
   ) {
     console.log('Req(): ' + req);
@@ -105,6 +107,7 @@ export class ReviewController {
     status: 200,
     description: 'Review successfully deleted.',
   })
+  @UseGuards(AuthGuard)
   @ApiResponse({ status: 404, description: 'Review not found.' })
   remove(@Param('id') id: string) {
     return this.reviewService.remove(id);

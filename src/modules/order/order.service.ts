@@ -204,6 +204,7 @@ export class OrderService extends PrismaClient implements OnModuleInit {
       return await this.order.findMany({
         include: {
           user: true,
+          course:true
         },
       });
     }
@@ -214,6 +215,7 @@ export class OrderService extends PrismaClient implements OnModuleInit {
         },
         include: {
           user: true,
+          course:true
         },
       });
     }
@@ -224,6 +226,7 @@ export class OrderService extends PrismaClient implements OnModuleInit {
         },
         include: {
           user: true,
+          course:true
         },
       });
     }

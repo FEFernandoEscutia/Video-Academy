@@ -73,8 +73,8 @@ export class CourseService extends PrismaClient implements OnModuleInit {
       return await this.course.findMany({
         where: { ...techFilter, ...freeFilter },
         include: {
-          // videos: true,
-          // reviews: true,
+          videos: true,
+          reviews: true,
         },
       });
     }

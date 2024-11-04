@@ -103,15 +103,18 @@ export class ReviewController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Delete a review by ID' })
   @ApiResponse({
     status: 200,
     description: 'Review successfully deleted.',
   })
-  @UseGuards(AuthGuard)
   @ApiResponse({ status: 404, description: 'Review not found.' })
-  remove(@Param('id') id: string) {
-    return this.reviewService.remove(id);
+  remove(@Param('id') id: string, @Req() req: any) {
+    const userId = req.user.id;
+    const userRole = req.user.role;
+
+    return this.reviewService.remove(id, userId, userRole);
   }
 
   @Get('course/:id')

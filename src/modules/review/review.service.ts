@@ -9,6 +9,8 @@ import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { PrismaClient } from '@prisma/client';
 
+import { ForbiddenException } from '@nestjs/common';
+
 @Injectable()
 export class ReviewService extends PrismaClient implements OnModuleInit {
   private readonly logger = new Logger('Review Service');
@@ -58,25 +60,6 @@ export class ReviewService extends PrismaClient implements OnModuleInit {
       message: `Thank you for sharing your experience! Your feedback on ${createdReview.course.title} helps us improve.`,
     };
   }
-
-  /* async findAll() {
-    return this.review.findMany({
-      include: {
-        course: {
-          select: {
-            id: true,
-            title: true,
-          },
-        },
-        user: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-      },
-    });
-  } */
 
   async findAll() {
     const reviews = await this.review.findMany({
@@ -139,7 +122,25 @@ export class ReviewService extends PrismaClient implements OnModuleInit {
     });
   }
 
-  async remove(id: string) {
+  async remove(id: string, userId: string, userRole: string) {
+    // Buscar la review a eliminar
+    const review = await this.review.findUnique({
+      where: { id },
+      select: { userId: true },
+    });
+
+    if (!review) {
+      throw new NotFoundException('Review not found.');
+    }
+
+    if (userRole !== 'ROLE.ADMIN') {
+      if (review.userId !== userId) {
+        throw new ForbiddenException(
+          'You are not allowed to delete this review.',
+        );
+      }
+    }
+
     return this.review.delete({
       where: { id },
       include: {
@@ -183,20 +184,6 @@ export class ReviewService extends PrismaClient implements OnModuleInit {
     const uniqueReviews = [];
     const courseIds = new Set();
 
-    /* for (const review of reviews) {
-      if (!courseIds.has(review.courseId)) {
-        uniqueReviews.push({
-          ...review,
-          user: { ...review.user, username: review.user.name, name: undefined },
-        });
-        courseIds.add(review.courseId);
-      }
-
-      if (uniqueReviews.length >= 6) {
-        break;
-      }
-    } */
-
     for (const review of reviews) {
       if (!courseIds.has(review.courseId)) {
         uniqueReviews.push({
@@ -229,10 +216,10 @@ export class ReviewService extends PrismaClient implements OnModuleInit {
       where: {
         courseId: dbCourse.id,
       },
-      include:{
-        course:true,
-        user:true
-      }
+      include: {
+        course: true,
+        user: true,
+      },
     });
   }
 }

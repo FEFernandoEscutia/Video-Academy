@@ -64,6 +64,44 @@ export class FilesController {
     return this.filesService.uploadFileUsingId(loggedUser.id, file);
   }
 
+  @Post('course/:id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @UseInterceptors(FileInterceptor('image'))
+  @ApiOperation({
+    summary: 'Upload an image file for an specific User',
+    description:
+      'USERS can upload an image only for their own profile, ADMINS can upload an image for any user by specifying the user ID.',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        image: {
+          type: 'string',
+          format: 'binary',
+          description: 'Image file to upload (jpg, jpeg, png, or webp)',
+        },
+      },
+    },
+  })
+  async uploadCourseFileUsingId(
+    @Param('id') id: string,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new FileTypeValidator({
+            fileType: /(jpg|jpeg|webp)$/,
+          }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+  ) {
+    return this.filesService.uploadCourseFileUsingId(id, file);
+  }
+
   @Post('GoogleUpload')
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(@UploadedFile() file: Express.Multer.File) {

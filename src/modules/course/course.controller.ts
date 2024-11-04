@@ -256,7 +256,6 @@ export class CourseController {
   async remove(@Param('id') id: string) {
     const courseById = await this.courseService.remove(id);
 
-    // Verificar si el curso fue encontrado
     if (!courseById) {
       throw new NotFoundException('Course not found');
     }

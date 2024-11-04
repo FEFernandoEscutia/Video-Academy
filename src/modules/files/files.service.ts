@@ -61,6 +61,39 @@ export class FilesService extends PrismaClient implements OnModuleInit {
     
   }
 
+  async uploadCourseFileUsingId(id: string, file: Express.Multer.File) {
+    const dbCourse = await this.course.findFirst({ where: { id } });
+
+    if (!dbCourse) {
+      throw new NotFoundException(`course was not found`);
+    }
+
+    return new Promise((resolve, reject) => {
+      const upload = v2.uploader.upload_stream(
+        {
+          resource_type: 'auto',
+          transformation: [{ transformation: 'User-picture' }],
+        },
+        (error, result: UploadApiResponse) => {
+          if (error) {
+            reject(error);
+          } else {
+            this.course
+              .update({
+                where: { id: dbCourse.id },
+                data: { thumbnail: result.url },
+              })
+              .then(() => resolve(result))
+              .catch(reject);
+
+          }
+        },
+      );
+      toStream(file.buffer).pipe(upload);
+    });
+    
+  }
+
   async uploadGoogleFiles(file: Express.Multer.File) {
     const bucket = this.storage.bucket(this.bucketName);
     const destination = `uploads/${Date.now()}-${file.originalname}`;

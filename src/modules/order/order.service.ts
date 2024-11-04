@@ -13,11 +13,15 @@ import { envs } from 'src/config';
 import { Request, Response } from 'express';
 import { UUID } from 'crypto';
 import { StatusDto } from './dto/status.dto';
+import { EmailService } from 'src/emails/emails.service';
 
 @Injectable()
 export class OrderService extends PrismaClient implements OnModuleInit {
   private readonly stripe = new Stripe(envs.stripeSecret);
   private readonly logger = new Logger('Order Service');
+  constructor(private readonly emailService: EmailService) {
+    super();
+  }
   onModuleInit() {
     this.$connect();
     this.logger.log('Database Connected');
@@ -162,6 +166,12 @@ export class OrderService extends PrismaClient implements OnModuleInit {
             },
           },
         });
+        await this.emailService.coursePurchased(
+          succeeded.metadata.email,
+          succeeded.metadata.name,
+          dbCourse.title,
+        );
+        this.logger.log(`Purchase email sent to ${succeeded.metadata.email}`);
         await this.user.update({
           where: { id: succeeded.metadata.userId },
           data: { courses: { connect: { id: dbCourse.id } } },
@@ -204,7 +214,7 @@ export class OrderService extends PrismaClient implements OnModuleInit {
       return await this.order.findMany({
         include: {
           user: true,
-          course:true
+          course: true,
         },
       });
     }
@@ -215,7 +225,7 @@ export class OrderService extends PrismaClient implements OnModuleInit {
         },
         include: {
           user: true,
-          course:true
+          course: true,
         },
       });
     }
@@ -226,7 +236,7 @@ export class OrderService extends PrismaClient implements OnModuleInit {
         },
         include: {
           user: true,
-          course:true
+          course: true,
         },
       });
     }

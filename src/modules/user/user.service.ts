@@ -11,10 +11,14 @@ import { PrismaClient, Role } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { envs } from 'src/config';
 import { PaginationDto } from 'src/common/pagination.dto';
+import { EmailService } from 'src/emails/emails.service';
 
 @Injectable()
 export class UserService extends PrismaClient implements OnModuleInit {
   private readonly logger = new Logger('User Service');
+  constructor(private readonly emailService: EmailService) {
+    super();
+  }
   //****************************************************************************************************
   async onModuleInit() {
     this.$connect();
@@ -59,7 +63,12 @@ export class UserService extends PrismaClient implements OnModuleInit {
       );
     }
     const hashPassword = await bcrypt.hash(createUserDto.password, 10);
-    return this.user.create({
+    await this.emailService.sendWelcomeEmail(
+      createUserDto.email,
+      createUserDto.name,
+    );
+    this.logger.log(`Welcome email sent to ${createUserDto.email}`);
+    return await this.user.create({
       data: { ...rData, password: hashPassword, role: Role.USER },
     });
   }

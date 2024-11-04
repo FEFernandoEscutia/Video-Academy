@@ -167,12 +167,7 @@ export class ReviewService extends PrismaClient implements OnModuleInit {
             title: true,
           },
         },
-        user: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
+        user: true,
       },
     });
 

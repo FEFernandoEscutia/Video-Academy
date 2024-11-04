@@ -121,24 +121,25 @@ export class CourseController {
     return this.courseService.findAll(filterDto);
   }
 
-
   //******************************************** Retrieve top courses (ONLY ADMINS)  ******************************************/
-  
- 
+
   @Get('findAllCourseAdmin')
   @ApiOperation({
     summary: 'Retrieve top courses',
-    description: 'Get courses with the most users enrolled and the highest ratings. Only Admins can access this data.'
+    description:
+      'Get courses with the most users enrolled and the highest ratings. Only Admins can access this data.',
   })
   @ApiResponse({ status: 200, description: 'Courses retrieved successfully.' })
-  @ApiResponse({ status: 403, description: 'Forbidden. Only Admins can access this data.' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden. Only Admins can access this data.',
+  })
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
-  async findAllCourseAdmin( @Query()  filterDto: CourseFilterDto) {
-
+  async findAllCourseAdmin(@Query() filterDto: CourseFilterDto) {
     return await this.courseService.findTopCourses(filterDto);
   }
-  
+
   //**********************************FIND MY COURSES **********************************************
 
   @Get('My-Courses')

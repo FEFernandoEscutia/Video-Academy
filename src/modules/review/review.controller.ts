@@ -21,6 +21,9 @@ import { AuthGuard } from '../../guards/auth.guard';
 import { JwtService } from '@nestjs/jwt';
 
 import { ContentFilterService } from '../../services/content-filter.service';
+import { RolesGuard } from 'src/guards/roles.guard';
+import { Roles } from 'src/decorators/role.decorator';
+import { Role } from '@prisma/client';
 
 @ApiTags('Reviews')
 @Controller('review')
@@ -74,6 +77,8 @@ export class ReviewController {
     status: 200,
     description: 'List of reviews successfully retrieved.',
   })
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   findAll() {
     return this.reviewService.findAll();
   }
@@ -103,15 +108,18 @@ export class ReviewController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Delete a review by ID' })
   @ApiResponse({
     status: 200,
     description: 'Review successfully deleted.',
   })
-  @UseGuards(AuthGuard)
   @ApiResponse({ status: 404, description: 'Review not found.' })
-  remove(@Param('id') id: string) {
-    return this.reviewService.remove(id);
+  remove(@Param('id') id: string, @Req() req: any) {
+    const userId = req.user.id;
+    const userRole = req.user.role;
+
+    return this.reviewService.remove(id, userId, userRole);
   }
 
   @Get('course/:id')

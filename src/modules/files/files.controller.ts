@@ -22,16 +22,16 @@ import { AuthGuard } from 'src/guards/auth.guard';
 @ApiTags('files')
 @Controller('files')
 export class FilesController {
-  constructor(private readonly filesService: FilesService) {
-    
-  }
+  constructor(private readonly filesService: FilesService) {}
 
-  @Post('user:id')
+  @Post('user')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
   @UseInterceptors(FileInterceptor('image'))
-  @ApiOperation({ summary: 'Upload an image file for an specific User',
-    description:"USERS can upload an image only for their own profile, ADMINS can upload an image for any user by specifying the user ID."
+  @ApiOperation({
+    summary: 'Upload an image file for an specific User',
+    description:
+      'USERS can upload an image only for their own profile, ADMINS can upload an image for any user by specifying the user ID.',
   })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -47,7 +47,6 @@ export class FilesController {
     },
   })
   async uploadFileUsingId(
-    @Param('id') id: string,
     @Req() req: any,
     @UploadedFile(
       new ParseFilePipe({
@@ -62,13 +61,7 @@ export class FilesController {
   ) {
     const loggedUser = req.user;
 
-    if (loggedUser.roles === Role.USER) {
-      this.filesService.uploadFileUsingId(loggedUser.id, file);
-    }
-    if (loggedUser.roles === Role.ADMIN) {
-      console.log(loggedUser);
-      this.filesService.uploadFileUsingId(id, file);
-    }
+    return this.filesService.uploadFileUsingId(loggedUser.id, file);
   }
 
   @Post('GoogleUpload')
@@ -80,7 +73,7 @@ export class FilesController {
 
     try {
       const publicUrl = await this.filesService.uploadGoogleFiles(file);
-    
+
       return { url: publicUrl };
     } catch (error) {
       throw new BadRequestException('Failed to upload file');
@@ -88,4 +81,3 @@ export class FilesController {
   }
   //
 }
-

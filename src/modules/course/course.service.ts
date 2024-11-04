@@ -248,7 +248,7 @@ export class CourseService extends PrismaClient implements OnModuleInit {
     const courseByID = this.course.findFirst({ where: { id } });
 
     if (!courseByID) {
-      throw new Error('Course not found'); // Manejo de errores si no se encuentra el curso
+      throw new Error('Course not found'); 
     }
     return await this.course.update({
       where: { id },
@@ -257,15 +257,15 @@ export class CourseService extends PrismaClient implements OnModuleInit {
   }
 
   async remove(id: string): Promise<string> {
-    // Busca el curso por su ID
+  
     const course = await this.course.findFirst({ where: { id } });
 
-    // Si el curso no existe, lanza una excepción 404
+  
     if (!course) {
       throw new NotFoundException('Course not found');
     }
 
-    // Elimina el curso de manera lógica (isAvailable = false)
+ 
     await this.course.update({
       where: { id },
       data: { isAvailable: false },

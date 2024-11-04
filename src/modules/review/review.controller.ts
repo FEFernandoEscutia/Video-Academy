@@ -60,8 +60,6 @@ export class ReviewController {
   }
 
   @Get('top')
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
   @ApiOperation({ summary: 'Retrieve the top 6 diverse reviews' })
   @ApiResponse({
     status: 200,

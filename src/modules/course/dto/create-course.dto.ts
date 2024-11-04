@@ -13,6 +13,7 @@ import {
   IsPositive,
   IsUrl,
   IsOptional,
+  IsBoolean,
 } from 'class-validator';
 
 export class CreateCourseDto {
@@ -43,7 +44,6 @@ export class CreateCourseDto {
   @MaxLength(1000, { message: 'Description cannot exceed 1000 characters.' })
   description: string;
 
-
   @ApiProperty({
     description: 'Course price',
     example: 49.99,
@@ -65,4 +65,5 @@ export class CreateCourseDto {
   @IsUrl({}, { message: 'Thumbnail must be a valid URL.' })
   @IsOptional({ message: 'Thumbnail is optional.' })
   thumbnail?: string;
+
 }

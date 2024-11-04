@@ -21,6 +21,9 @@ import { AuthGuard } from '../../guards/auth.guard';
 import { JwtService } from '@nestjs/jwt';
 
 import { ContentFilterService } from '../../services/content-filter.service';
+import { RolesGuard } from 'src/guards/roles.guard';
+import { Roles } from 'src/decorators/role.decorator';
+import { Role } from '@prisma/client';
 
 @ApiTags('Reviews')
 @Controller('review')
@@ -74,6 +77,8 @@ export class ReviewController {
     status: 200,
     description: 'List of reviews successfully retrieved.',
   })
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   findAll() {
     return this.reviewService.findAll();
   }

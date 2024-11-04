@@ -87,15 +87,10 @@ export class ReviewService extends PrismaClient implements OnModuleInit {
             title: true,
           },
         },
-        user: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
+        user: true,
       },
     });
-    return reviews.reverse();
+    return reviews
   }
 
   async findOne(id: string) {
@@ -229,10 +224,10 @@ export class ReviewService extends PrismaClient implements OnModuleInit {
       where: {
         courseId: dbCourse.id,
       },
-      include:{
-        course:true,
-        user:true
-      }
+      include: {
+        course: true,
+        user: true,
+      },
     });
   }
 }

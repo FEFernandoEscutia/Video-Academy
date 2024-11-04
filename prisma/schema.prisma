@@ -72,19 +72,21 @@ model Order {
 //En la orden se puede comprar ya sea un curso o una subscripcion
 
 model OrderDetail {
-  id       String @id @default(uuid())
-  order    Order  @relation(fields: [orderId], references: [id]) // Relación uno a uno: un detalle de orden pertenece a una sola orden.
-  orderId  String @unique // Este campo almacena el ID de la orden a la que pertenece el detalle. En Prisma, es necesario para gestionar la relación y almacenar la clave foránea que conecta esta entidad con la orden.
+  id       String  @id @default(uuid())
+  order    Order   @relation(fields: [orderId], references: [id]) // Relación uno a uno: un detalle de orden pertenece a una sola orden.
+  orderId  String  @unique // Este campo almacena el ID de la orden a la que pertenece el detalle. En Prisma, es necesario para gestionar la relación y almacenar la clave foránea que conecta esta entidad con la orden.
   ticket   String?
   quantity Int
   price    Float //numeros con decimales
 }
+
 model Review {
-  id       String @id @default(uuid())
-  content  String
-  course   Course @relation(fields: [courseId], references: [id]) // Relación muchos a uno: muchas reseñas pueden estar relacionadas con un solo video.
-  rating   Int    @default(5)
-  courseId String // Este campo almacena el ID del video asociado a la reseña. En Prisma, este campo es necesario para gestionar la relación con la tabla de videos, almacenando el ID como clave foránea.
-  user     User   @relation(fields: [userId], references: [id]) // Relación muchos a uno: muchas reseñas pueden pertenecer a un solo usuario.
-  userId   String // Este campo almacena el ID del usuario que escribió la reseña. Prisma lo usa para gestionar la relación y almacenar el ID en la tabla de reseñas.
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now())
+  course    Course   @relation(fields: [courseId], references: [id]) // Relación muchos a uno: muchas reseñas pueden estar relacionadas con un solo video.
+  rating    Int      @default(5)
+  courseId  String // Este campo almacena el ID del video asociado a la reseña. En Prisma, este campo es necesario para gestionar la relación con la tabla de videos, almacenando el ID como clave foránea.
+  user      User     @relation(fields: [userId], references: [id]) // Relación muchos a uno: muchas reseñas pueden pertenecer a un solo usuario.
+  userId    String // Este campo almacena el ID del usuario que escribió la reseña. Prisma lo usa para gestionar la relación y almacenar el ID en la tabla de reseñas.
 }

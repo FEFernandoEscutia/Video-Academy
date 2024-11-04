@@ -170,6 +170,7 @@ export class OrderService extends PrismaClient implements OnModuleInit {
           succeeded.metadata.email,
           succeeded.metadata.name,
           dbCourse.title,
+          succeeded.receipt_url
         );
         this.logger.log(`Purchase email sent to ${succeeded.metadata.email}`);
         await this.user.update({

@@ -35,13 +35,15 @@ export class EmailService {
     }
   }
 
-  async coursePurchased(email: string, name: string, courseName: string) {
+  async coursePurchased(email: string, name: string, courseName: string, receipt_url:string) {
     const mailOptions = {
       from: envs.gmailEmail,
       to: email,
       subject: `Thank you for purchasing the course: ${courseName}`,
-      text: `Hello ${name}, thank you for purchasing the course "${courseName}". We hope you enjoy it!`,
-      html: `<p>Hello ${name},</p><p>Thank you for purchasing the course "<strong>${courseName}</strong>". We hope you enjoy it and have a valuable learning experience!</p>`,
+      text: `Hello ${name}, thank you for purchasing the course "${courseName}". We hope you enjoy it! You can view your receipt here: ${receipt_url}`,
+      html: `<p>Hello ${name},</p>
+             <p>Thank you for purchasing the course "<strong>${courseName}</strong>". We hope you enjoy it and have a valuable learning experience!</p>
+             <p>You can view your receipt <a href="${receipt_url}">here</a>.</p>`,
     };
 
     try {

@@ -63,6 +63,7 @@ export class VideoService extends PrismaClient implements OnModuleInit {
     return { message: 'Video created and added successfully' };
   }
 
+
   async findAll() {
     return this.video.findMany();
   }

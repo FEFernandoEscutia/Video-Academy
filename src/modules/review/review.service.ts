@@ -1,13 +1,14 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   Logger,
   NotFoundException,
   OnModuleInit,
 } from '@nestjs/common';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Role } from '@prisma/client';
 
 import { ForbiddenException } from '@nestjs/common';
 
@@ -73,7 +74,7 @@ export class ReviewService extends PrismaClient implements OnModuleInit {
         user: true,
       },
     });
-    return reviews
+    return reviews;
   }
 
   async findOne(id: string) {
@@ -118,41 +119,32 @@ export class ReviewService extends PrismaClient implements OnModuleInit {
   }
 
   async remove(id: string, userId: string, userRole: string) {
-    // Buscar la review a eliminar
     const review = await this.review.findUnique({
       where: { id },
       select: { userId: true },
     });
 
+
     if (!review) {
       throw new NotFoundException('Review not found.');
     }
+    const isAuthorized = userRole === Role.ADMIN || userId === review.userId;
 
-    if (userRole !== 'ROLE.ADMIN') {
-      if (review.userId !== userId) {
-        throw new ForbiddenException(
-          'You are not allowed to delete this review.',
-        );
-      }
+    if (!isAuthorized) {
+      throw new ForbiddenException(
+        'You are not allowed to delete this review.',
+      );
     }
 
-    return this.review.delete({
-      where: { id },
-      include: {
-        course: {
-          select: {
-            id: true,
-            title: true,
-          },
-        },
-        user: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-      },
-    });
+    try {
+      return await this.review.delete({
+        where: { id },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'An error occurred while deleting the review.',
+      );
+    }
   }
 
   async findTopReviews() {

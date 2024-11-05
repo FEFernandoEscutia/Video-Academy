@@ -1,6 +1,6 @@
 # Usa Node.js como imagen base
 # FROM node:18
-FROM node:20-alpine
+FROM node:18-alpine
 # Establece el directorio de trabajo dentro del contenedor
 WORKDIR /app
 
@@ -20,7 +20,7 @@ RUN npx prisma generate
 EXPOSE 3000
 
 # Comando para iniciar la aplicación
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "start:dev"]
 
 
 

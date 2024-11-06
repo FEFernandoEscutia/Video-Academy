@@ -179,7 +179,6 @@ export class ReviewService extends PrismaClient implements OnModuleInit {
       }
     }
 
-    this.logger.log('uniqueReviews', uniqueReviews);
     return uniqueReviews;
   }
 

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   Logger,
   NotFoundException,
@@ -13,7 +14,6 @@ const toStream = require('buffer-to-stream');
 @Injectable()
 export class CourseService extends PrismaClient implements OnModuleInit {
   private readonly logger = new Logger('Course Service');
-  
 
   async onModuleInit() {
     this.$connect();
@@ -241,31 +241,35 @@ export class CourseService extends PrismaClient implements OnModuleInit {
     });
   }
 
-  async update(
-    id: string,
-    updateCourseDto: UpdateCourseDto,
-  ): Promise<UpdateCourseDto> {
-    const courseByID = this.course.findFirst({ where: { id } });
-
-    if (!courseByID) {
-      throw new Error('Course not found'); 
+  async update(id: string, updateCourseDto: UpdateCourseDto) {
+    const { title, isAvailable, price, description } = updateCourseDto;
+    const dbCourse = await this.course.findFirst({ where: { id } });
+    if (!dbCourse) {
+      throw new NotFoundException('Course not found');
     }
+    const updatedData = {
+      title: title !== undefined && title !== '' ? title : dbCourse.title,
+      isAvailable:
+        isAvailable !== null ? isAvailable : dbCourse.isAvailable,
+      price: price !== undefined && price !== null ? price : dbCourse.price,
+      description:
+        description !== undefined && description !== ''
+          ? description
+          : dbCourse.description,
+    };
     return await this.course.update({
       where: { id },
-      data: updateCourseDto,
+      data: updatedData,
     });
   }
 
   async remove(id: string): Promise<string> {
-  
     const course = await this.course.findFirst({ where: { id } });
 
-  
     if (!course) {
       throw new NotFoundException('Course not found');
     }
 
- 
     await this.course.update({
       where: { id },
       data: { isAvailable: false },

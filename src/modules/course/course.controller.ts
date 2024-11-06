@@ -212,16 +212,6 @@ export class CourseController {
     description:
       'This endpoint allows only Admins to update a course. Authentication is required.',
   })
-  @ApiParam({
-    name: 'id',
-    description: 'The ID of the course to update',
-    example: '1',
-  })
-  @ApiResponse({ status: 200, description: 'Course updated successfully.' })
-  @ApiResponse({
-    status: 403,
-    description: 'Forbidden. Only Admins can update courses.',
-  })
   @Patch(':id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.ADMIN)

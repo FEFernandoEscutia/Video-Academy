@@ -1,30 +1,37 @@
+import { Inject, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
+import { ConfigService, ConfigType } from '@nestjs/config';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
-import { config } from 'dotenv';
-
-import { Injectable } from '@nestjs/common';
-
-config();
+import googleOauthConfig from 'src/config/google-oauth.config';
+import { AuthService } from './auth.service';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
-    constructor() {
-        super({
-            clientID: '149883907678-a3hbaav1d513uujomiptve3jm7thh6dg.apps.googleusercontent.com',
-            clientSecret: 'z5BYROvv8R6dlnaIt3W50a5m',
-            callbackURL: 'http://localhost:3000/api/auth/google/callback',
-            scope: ['email', 'profile'],
-        });
-    }
-    async validate(accessToken: string, refreshToken: string, profile: any, done: VerifyCallback): Promise<any> {
-        const { name, emails, photos } = profile
-        const user = {
-            email: emails[0].value,
-            firstName: name.givenName,
-            lastName: name.familyName,
-            picture: photos[0].value,
-            accessToken
-        }
-        done(null, user);
-    }
+  constructor(
+    @Inject(googleOauthConfig.KEY)
+    private readonly googleConfiguration: ConfigType<typeof googleOauthConfig>,
+    private readonly authService: AuthService,
+  ) {
+    super({
+      clientID: googleConfiguration.clientID,
+      clientSecret: googleConfiguration.clientSecret,
+      callbackURL: googleConfiguration.callbackURL,
+      scope: ['email', 'profile'],
+    });
+  }
+
+  async validate(
+    accessToken: string,
+    refreshToken: string,
+    profile: any,
+    done: VerifyCallback,
+  ): Promise<any> {
+    const user = await this.authService.validateGoogleUser({
+      email: profile.emails[0].value,
+    name: profile.name.givenName + ' ' + profile.name.familyName,
+    phone: '', // Lógica para el teléfono si se necesita
+    // No incluyas password para usuarios de Google
+  });
+  done(null, user);
 }
+  }

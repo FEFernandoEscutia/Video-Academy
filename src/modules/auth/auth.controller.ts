@@ -1,7 +1,7 @@
 import { Controller, Post, Body, UseInterceptors, Req, Get, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthInterceptor } from 'src/interceptors/auth.interceptor';
 import { GoogleAuthGuard } from 'src/guards/google.oauth.guard';
 import { AuthGuard } from '@nestjs/passport';
@@ -23,14 +23,31 @@ export class AuthController {
 
   //*************************** auth Google ************************** */
 
-
- 
-  
+  @ApiResponse({
+    status: 302,
+    description: 'Redirects to Google for authentication',
+  })
   @Get('google/login')
   @UseGuards(AuthGuard('google'))
   googleLogin() {}
 
-
+  @ApiOperation({
+    summary: 'Handle Google authentication callback',
+    description: 'Receives the callback from Google after user authentication, then redirects to the frontend with a JWT token.',
+  })
+  @ApiResponse({
+    status: 302,
+    description: 'Redirects to the frontend with JWT token in the URL',
+    headers: {
+      Location: {
+        description: 'URL with JWT token parameter',
+        schema: {
+          type: 'string',
+          example: 'http://localhost:3000?token=your-jwt-token',
+        },
+      },
+    },
+  })
   @UseGuards(GoogleAuthGuard)
   @Get('google/callback')
   async googleCallback(@Req() req, @Res() res) {

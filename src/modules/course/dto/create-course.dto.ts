@@ -37,9 +37,6 @@ export class CreateCourseDto {
   })
   @IsString()
   @IsNotEmpty({ message: 'Description is required.' })
-  @MinLength(20, {
-    message: 'Description must be at least 20 characters long.',
-  })
   @MaxLength(1000, { message: 'Description cannot exceed 1000 characters.' })
   description: string;
 

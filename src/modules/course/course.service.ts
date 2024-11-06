@@ -308,7 +308,7 @@ export class CourseService extends PrismaClient implements OnModuleInit {
         toStream(file.buffer).pipe(upload);
       });
 
-      return { message: 'Course has been updated correctly' };
+      return { message: 'Course has been updated correctly.' };
     } catch (error) {
       throw new InternalServerErrorException('Failed to upload image');
     }

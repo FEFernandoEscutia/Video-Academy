@@ -234,8 +234,7 @@ export class CourseService extends PrismaClient implements OnModuleInit {
   async findOne(id: string): Promise<CreateCourseDto> {
     return await this.course.findFirst({
       where: {
-        isAvailable: true,
-        id: id,
+        id,
       },
       include: {
         videos: true,

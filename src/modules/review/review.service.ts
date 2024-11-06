@@ -78,15 +78,10 @@ export class ReviewService extends PrismaClient implements OnModuleInit {
   }
 
   async findOne(id: string) {
-    return this.review.findUnique({
+    return await  this.review.findFirst({
       where: { id },
       include: {
-        course: {
-          select: {
-            id: true,
-            title: true,
-          },
-        },
+        course: true,
         user: {
           select: {
             id: true,

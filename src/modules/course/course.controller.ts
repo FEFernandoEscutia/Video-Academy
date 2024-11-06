@@ -16,7 +16,6 @@ import {
   UploadedFile,
   ParseFilePipe,
   FileTypeValidator,
-  ParseFilePipeBuilder,
   BadRequestException,
 } from '@nestjs/common';
 import { CourseService } from './course.service';

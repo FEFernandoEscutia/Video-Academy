@@ -78,16 +78,18 @@ export class AuthService extends PrismaClient implements OnModuleInit {
   async validateGoogleUser(profileData: any): Promise<any> {
 
     const DEFAULT_IMAGE_URL = 'https://img.freepik.com/vector-premium/icono-perfil-avatar-predeterminado-imagen-usuario-redes-sociales-icono-avatar-gris-silueta-perfil-blanco-ilustracion-vectorial_561158-3407.jpg?w=740';
+    const uniquePhone = profileData.phone || `Phone-Not-Available-${profileData.emails[0].value}`;
+    const uniquePassword = `GoogleAuth-${profileData.email}`;
     const user = await this.user.upsert({
       where: { email: profileData.email },
-      update: {}, // Aquí puedes manejar actualizaciones si es necesario
+      update: {}, 
       create: {
         email: profileData.email,
         name: profileData.name,
-        phone: profileData.phone || 'no disponible',
+        phone: uniquePhone,
         image: profileData.image || DEFAULT_IMAGE_URL,
         role: 'USER',
-        password: 'google-auth', // Proporciona un valor de contraseña por defecto
+        password: uniquePassword, 
       },
     });
     return user;

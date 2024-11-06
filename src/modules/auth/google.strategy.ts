@@ -21,16 +21,17 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   }
 
   async validate(
-    accessToken: string,
+    token: string,
     refreshToken: string,
     profile: any,
     done: VerifyCallback,
   ): Promise<any> {
-    const user = await this.authService.validateGoogleUser({
-      email: profile.emails[0].value,
-    name: profile.name.givenName + ' ' + profile.name.familyName,
-    phone: '', // Lógica para el teléfono si se necesita
-    // No incluyas password para usuarios de Google
+    console.log(profile);
+      const user = await this.authService.validateGoogleUser({
+        email: profile.emails[0].value,
+        name: `${profile.name.givenName} ${profile.name.familyName}`,
+        phone: profile.phoneNumbers?.[0]?.value || `Phone-Not-Available-${profile.emails[0].value}`, // Solo pasa el teléfono si está disponible
+        image: profile.photos?.[0]?.value || 'default-image-url', 
   });
   done(null, user);
 }

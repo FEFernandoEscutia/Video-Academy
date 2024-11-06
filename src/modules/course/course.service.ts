@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   Logger,
   NotFoundException,
   OnModuleInit,
@@ -10,6 +11,7 @@ import { UpdateCourseDto } from './dto/update-course.dto';
 import { Course, PrismaClient } from '@prisma/client';
 import { CourseFilterDto } from './dto/filter-course.dto';
 import { UploadApiResponse, v2 } from 'cloudinary';
+import { Multer } from 'multer';
 const toStream = require('buffer-to-stream');
 @Injectable()
 export class CourseService extends PrismaClient implements OnModuleInit {
@@ -241,26 +243,75 @@ export class CourseService extends PrismaClient implements OnModuleInit {
     });
   }
 
-  async update(id: string, updateCourseDto: UpdateCourseDto) {
-    const { title, isAvailable, price, description } = updateCourseDto;
+  async update(
+    id: string,
+    updateCourseDto: UpdateCourseDto,
+    file?: Express.Multer.File,
+  ) {
     const dbCourse = await this.course.findFirst({ where: { id } });
     if (!dbCourse) {
-      throw new NotFoundException('Course not found');
+      throw new NotFoundException('Course does not exist');
     }
-    const updatedData = {
-      title: title !== undefined && title !== '' ? title : dbCourse.title,
-      isAvailable:
-        isAvailable !== null ? isAvailable : dbCourse.isAvailable,
-      price: price !== undefined && price !== null ? price : dbCourse.price,
-      description:
-        description !== undefined && description !== ''
-          ? description
-          : dbCourse.description,
-    };
-    return await this.course.update({
-      where: { id },
-      data: updatedData,
-    });
+    const { title, isAvailable, price, description } = updateCourseDto;
+    if (!file) {
+      await this.course.update({
+        where: { id },
+        data: {
+          title: title !== undefined && title !== '' ? title : dbCourse.title,
+          isAvailable: isAvailable,
+          price: price !== undefined && price !== null ? price : dbCourse.price,
+          description:
+            description !== undefined && description !== ''
+              ? description
+              : dbCourse.description,
+        },
+      });
+      return { message: 'Course has been updated correctly' };
+    }
+
+    try {
+      new Promise((resolve, reject) => {
+        const upload = v2.uploader.upload_stream(
+          {
+            resource_type: 'auto',
+            transformation: [{ transformation: 'Regular size' }],
+          },
+          async (error, result: UploadApiResponse) => {
+            if (error) {
+              reject(error);
+            } else {
+              const updatedCourse = {
+                title:
+                  title !== undefined && title !== '' ? title : dbCourse.title,
+                isAvailable:
+                  isAvailable !== null ? isAvailable : dbCourse.isAvailable,
+                price:
+                  price !== undefined && price !== null
+                    ? price
+                    : dbCourse.price,
+                description:
+                  description !== undefined && description !== ''
+                    ? description
+                    : dbCourse.description,
+                thumbnail: result.url,
+              };
+
+              await this.course.update({
+                where: { id },
+                data: { ...updatedCourse },
+              });
+
+              resolve(result);
+            }
+          },
+        );
+        toStream(file.buffer).pipe(upload);
+      });
+
+      return { message: 'Course has been updated correctly' };
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to upload image');
+    }
   }
 
   async remove(id: string): Promise<string> {

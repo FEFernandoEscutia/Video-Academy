@@ -16,6 +16,8 @@ import {
   UploadedFile,
   ParseFilePipe,
   FileTypeValidator,
+  ParseFilePipeBuilder,
+  BadRequestException,
 } from '@nestjs/common';
 import { CourseService } from './course.service';
 import { CreateCourseDto } from './dto/create-course.dto';
@@ -214,12 +216,20 @@ export class CourseController {
   })
   @Patch(':id')
   @UseGuards(AuthGuard, RolesGuard)
+  @UseInterceptors(FileInterceptor('image'))
   @Roles(Role.ADMIN)
   async update(
     @Param('id') id: string,
     @Body() updateCourseDto: UpdateCourseDto,
+    @UploadedFile()file?: Express.Multer.File,
   ) {
-    return this.courseService.update(id, updateCourseDto);
+    if (file) {
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      if (!allowedTypes.includes(file.mimetype)) {
+        throw new BadRequestException('Invalid file type. Only jpg, png, and webp are allowed.');
+      }
+    }
+    return this.courseService.update(id, updateCourseDto, file);
   }
 
   //************************************  delete course ********************************* */

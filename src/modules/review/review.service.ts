@@ -1,12 +1,16 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   Logger,
+  NotFoundException,
   OnModuleInit,
 } from '@nestjs/common';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Role } from '@prisma/client';
+
+import { ForbiddenException } from '@nestjs/common';
 
 @Injectable()
 export class ReviewService extends PrismaClient implements OnModuleInit {
@@ -58,25 +62,6 @@ export class ReviewService extends PrismaClient implements OnModuleInit {
     };
   }
 
-  /* async findAll() {
-    return this.review.findMany({
-      include: {
-        course: {
-          select: {
-            id: true,
-            title: true,
-          },
-        },
-        user: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-      },
-    });
-  } */
-
   async findAll() {
     const reviews = await this.review.findMany({
       include: {
@@ -86,15 +71,10 @@ export class ReviewService extends PrismaClient implements OnModuleInit {
             title: true,
           },
         },
-        user: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
+        user: true,
       },
     });
-    return reviews.reverse();
+    return reviews;
   }
 
   async findOne(id: string) {
@@ -138,24 +118,33 @@ export class ReviewService extends PrismaClient implements OnModuleInit {
     });
   }
 
-  async remove(id: string) {
-    return this.review.delete({
+  async remove(id: string, userId: string, userRole: string) {
+    const review = await this.review.findUnique({
       where: { id },
-      include: {
-        course: {
-          select: {
-            id: true,
-            title: true,
-          },
-        },
-        user: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-      },
+      select: { userId: true },
     });
+
+
+    if (!review) {
+      throw new NotFoundException('Review not found.');
+    }
+    const isAuthorized = userRole === Role.ADMIN || userId === review.userId;
+
+    if (!isAuthorized) {
+      throw new ForbiddenException(
+        'You are not allowed to delete this review.',
+      );
+    }
+
+    try {
+      return await this.review.delete({
+        where: { id },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'An error occurred while deleting the review.',
+      );
+    }
   }
 
   async findTopReviews() {
@@ -170,12 +159,7 @@ export class ReviewService extends PrismaClient implements OnModuleInit {
             title: true,
           },
         },
-        user: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
+        user: true,
       },
     });
 
@@ -186,7 +170,6 @@ export class ReviewService extends PrismaClient implements OnModuleInit {
       if (!courseIds.has(review.courseId)) {
         uniqueReviews.push({
           ...review,
-          user: { ...review.user, username: review.user.name, name: undefined },
         });
         courseIds.add(review.courseId);
       }
@@ -198,5 +181,27 @@ export class ReviewService extends PrismaClient implements OnModuleInit {
 
     this.logger.log('uniqueReviews', uniqueReviews);
     return uniqueReviews;
+  }
+
+  async findAllWithCourseId(id: string) {
+    const dbCourse = await this.course.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!dbCourse) {
+      throw new NotFoundException('Course does not exist');
+    }
+
+    return await this.review.findMany({
+      where: {
+        courseId: dbCourse.id,
+      },
+      include: {
+        course: true,
+        user: true,
+      },
+    });
   }
 }

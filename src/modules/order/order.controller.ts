@@ -16,6 +16,7 @@ import { Roles } from 'src/decorators/role.decorator';
 import { Role } from '@prisma/client';
 import { Request, Response } from 'express';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { StatusDto } from './dto/status.dto';
 
 @ApiTags('orders')
 @Controller('orders')
@@ -67,8 +68,11 @@ export class OrderController {
   })
   @UseGuards(AuthGuard)
   @Roles(Role.USER, Role.ADMIN)
-  findAll(@Req() req: any) {
+  findAll(@Req() req: any, @Query() statusDto: StatusDto) {
     const loggedUser = req.user;
+    if (loggedUser.roles === Role.ADMIN) {
+      return this.orderService.adminFindAll(statusDto);
+    }
 
     return this.orderService.findAll(loggedUser.id);
   }
@@ -86,14 +90,15 @@ export class OrderController {
     return this.orderService.findOne(id);
   }
   //***************************************************************************************** */
-  @Delete()
+  @Delete(':id')
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Cancel Pending Order',
     description: `Endpoint is used to cancel an order that is still pending. it allows  to cancel orders that have not been completed.`,
   })
   @UseGuards(AuthGuard)
-  async deletePendingOrder(@Param('id') id: string) {
-    return this.orderService.deletePendingOrder(id);
+  async deletePendingOrder(@Param('id') id: string, @Req() req: any) {
+    const loggedUser = req.user;
+    return this.orderService.deletePendingOrder(id, loggedUser.id);
   }
 }

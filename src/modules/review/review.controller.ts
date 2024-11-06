@@ -10,6 +10,8 @@ import {
   Req,
   UseGuards,
   Query,
+  ParseUUIDPipe,
+  BadRequestException,
 } from '@nestjs/common';
 import { ReviewService } from './review.service';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -17,7 +19,11 @@ import { UpdateReviewDto } from './dto/update-review.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '../../guards/auth.guard';
 import { JwtService } from '@nestjs/jwt';
+
 import { ContentFilterService } from '../../services/content-filter.service';
+import { RolesGuard } from 'src/guards/roles.guard';
+import { Roles } from 'src/decorators/role.decorator';
+import { Role } from '@prisma/client';
 
 @ApiTags('Reviews')
 @Controller('review')
@@ -39,7 +45,7 @@ export class ReviewController {
   @ApiResponse({ status: 400, description: 'Invalid data provided.' })
   create(
     @Body() createReviewDto: CreateReviewDto,
-    @Req() req,
+    @Req() req: any,
     @Query('courseId') courseId: string,
   ) {
     console.log('Req(): ' + req);
@@ -71,6 +77,8 @@ export class ReviewController {
     status: 200,
     description: 'List of reviews successfully retrieved.',
   })
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   findAll() {
     return this.reviewService.findAll();
   }
@@ -100,13 +108,36 @@ export class ReviewController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.USER)
   @ApiOperation({ summary: 'Delete a review by ID' })
   @ApiResponse({
     status: 200,
     description: 'Review successfully deleted.',
   })
   @ApiResponse({ status: 404, description: 'Review not found.' })
-  remove(@Param('id') id: string) {
-    return this.reviewService.remove(id);
+  remove(@Param('id') id: string, @Req() req: any) {
+    const loggedUser = req.user
+    const userRole = loggedUser.roles
+    const userId = loggedUser.id
+    
+    
+    return this.reviewService.remove(id, userId, userRole);
+  }
+
+  @Get('course/:id')
+  @ApiOperation({
+    summary: 'Retrieve a review using the course ID',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Review successfully retrieved.',
+  })
+  @ApiResponse({ status: 404, description: 'Review not found.' })
+  getAllReviewsWithCourseId(@Param('id', ParseUUIDPipe) id: string) {
+    if (!id) {
+      throw new BadRequestException('Please provide a valid Id');
+    }
+    return this.reviewService.findAllWithCourseId(id);
   }
 }

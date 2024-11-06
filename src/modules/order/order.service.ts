@@ -1,7 +1,9 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   Logger,
+  NotFoundException,
   OnModuleInit,
 } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -10,11 +12,16 @@ import Stripe from 'stripe';
 import { envs } from 'src/config';
 import { Request, Response } from 'express';
 import { UUID } from 'crypto';
+import { StatusDto } from './dto/status.dto';
+import { EmailService } from 'src/emails/emails.service';
 
 @Injectable()
 export class OrderService extends PrismaClient implements OnModuleInit {
   private readonly stripe = new Stripe(envs.stripeSecret);
   private readonly logger = new Logger('Order Service');
+  constructor(private readonly emailService: EmailService) {
+    super();
+  }
   onModuleInit() {
     this.$connect();
     this.logger.log('Database Connected');
@@ -159,6 +166,13 @@ export class OrderService extends PrismaClient implements OnModuleInit {
             },
           },
         });
+        await this.emailService.coursePurchased(
+          succeeded.metadata.email,
+          succeeded.metadata.name,
+          dbCourse.title,
+          succeeded.receipt_url
+        );
+        this.logger.log(`Purchase email sent to ${succeeded.metadata.email}`);
         await this.user.update({
           where: { id: succeeded.metadata.userId },
           data: { courses: { connect: { id: dbCourse.id } } },
@@ -193,11 +207,49 @@ export class OrderService extends PrismaClient implements OnModuleInit {
       include: { details: true, course: true },
     });
   }
+  //*********************************************************************************************
+  async adminFindAll(statusDto: StatusDto) {
+    const { paid } = statusDto;
 
+    if (!paid) {
+      return await this.order.findMany({
+        include: {
+          user: true,
+          course: true,
+        },
+      });
+    }
+    if (paid === 'true') {
+      return await this.order.findMany({
+        where: {
+          status: true,
+        },
+        include: {
+          user: true,
+          course: true,
+        },
+      });
+    }
+    if (paid === 'false') {
+      return await this.order.findMany({
+        where: {
+          status: false,
+        },
+        include: {
+          user: true,
+          course: true,
+        },
+      });
+    }
+  }
+  //*********************************************************************************************
   async findOne(id: string) {
     const dbOrder = await this.order.findFirst({
       where: {
         id,
+      },
+      include: {
+        user: true,
       },
     });
     if (!dbOrder) {
@@ -206,8 +258,24 @@ export class OrderService extends PrismaClient implements OnModuleInit {
     return dbOrder;
   }
   //*****************************************************************
-  async deletePendingOrder(id: string) {
-    await this.order.delete({ where: { id, status: false } });
+  async deletePendingOrder(id: string, loggedUserId: string) {
+    const dbOrder = await this.order.findUnique({
+      where: { id },
+    });
+    if (!dbOrder) {
+      throw new NotFoundException(`Order with ID ${id} not found`);
+    }
+    if (dbOrder.userId !== loggedUserId) {
+      throw new ForbiddenException(
+        `You are not authorized to cancel this order`,
+      );
+    }
+    if (dbOrder.status) {
+      throw new BadRequestException(
+        `Order with ID ${id} has already been completed`,
+      );
+    }
+    await this.order.delete({ where: { id } });
     return { message: `Order has been cancelled correctly` };
   }
 }

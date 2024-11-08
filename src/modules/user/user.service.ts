@@ -152,11 +152,23 @@ export class UserService extends PrismaClient implements OnModuleInit {
     if (!userDb) {
       throw new BadRequestException('User does not exist');
     }
-    await this.user.delete({
+    await this.user.update({
       where: {
         id,
       },
+      data: {
+        isBanned: true,
+      },
     });
-    return { message: 'User has been deleted' };
+    return { message: 'User has been banned' };
+  }
+
+  async fullyRemove(id: string) {
+    const userDb = await this.findOne(id);
+    if (!userDb) {
+      throw new BadRequestException('User does not exist');
+    }
+    await this.user.delete({ where: { id } });
+    return { message: 'Your account has been deleted correctly' };
   }
 }

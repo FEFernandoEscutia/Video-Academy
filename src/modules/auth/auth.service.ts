@@ -43,6 +43,7 @@ export class AuthService extends PrismaClient implements OnModuleInit {
       id: dbUser.id,
       email: dbUser.email,
       roles: dbUser.role,
+      status:dbUser.isBanned
     };
 
     const token = this.jwtService.sign(userPayload, { secret: envs.jwtSecret });

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   Logger,
   NotFoundException,
@@ -50,7 +51,6 @@ export class VideoService extends PrismaClient implements OnModuleInit {
       });
     } catch (error) {
       console.log(error);
-      
     }
     const publicUrl = `https://storage.googleapis.com/${cloudFile.bucket.name}/${encodeURIComponent(cloudFile.name)}`;
     await this.video.create({
@@ -62,7 +62,6 @@ export class VideoService extends PrismaClient implements OnModuleInit {
     });
     return { message: 'Video created and added successfully' };
   }
-
 
   async findAll() {
     return this.video.findMany();
@@ -79,9 +78,16 @@ export class VideoService extends PrismaClient implements OnModuleInit {
     });
   }
 
-  remove(id: string) {
-    return this.video.delete({
+  async remove(id: string) {
+    const dbVideo = await this.video.findFirst({where:{
+      id
+    }})
+    if(!dbVideo){
+      throw new BadRequestException("video does not exist")
+    }
+    await this.video.delete({
       where: { id },
     });
+    return { message: 'Video deleted correctly' };
   }
 }

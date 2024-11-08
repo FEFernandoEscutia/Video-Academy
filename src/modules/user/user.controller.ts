@@ -10,6 +10,7 @@ import {
   Req,
   Query,
   UseInterceptors,
+  Put,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -81,29 +82,31 @@ export class UserController {
     description: `Admins can update any user's information, including admin privileges, and can specify the user ID in the parameter.
                   Regular users can only update their own profile, and their ID is automatically set.`,
   })
-  @Patch(':id')
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.ADMIN, Role.USER)
-  async update(
-    @Param('id') id: string,
-    @Body() updateUserDto: UpdateUserDto,
-    @Req() req: any,
-  ) {
+  @Patch()
+  @UseGuards(AuthGuard)
+  async update(@Body() updateUserDto: UpdateUserDto, @Req() req: any) {
     const requestingUser = req.user;
-
     if (updateUserDto.password) {
       const hashedPassword = await bcrypt.hash(updateUserDto.password, 10);
       updateUserDto.password = hashedPassword;
     }
-    if (requestingUser.roles === Role.ADMIN) {
-      return this.userService.update(id, updateUserDto);
-    }
-    if (requestingUser.roles === Role.USER) {
-      const { role, isBanned, ...data } = updateUserDto;
-      
-      
-       return this.userService.update(requestingUser.id, data);
-    }
+    const { role, isBanned, ...data } = updateUserDto;
+    return this.userService.update(requestingUser.id, data);
+    //
+  }
+
+  //*************************************************************************************
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Update user profile',
+    description: `Admins can update any user's information, including admin privileges, and can specify the user ID in the parameter.
+                   Regular users can only update their own profile, and their ID is automatically set.`,
+  })
+  @Put(':id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async unBanned(@Param('id') id: string, @Body('isBanned') isBanned: boolean) {
+    return this.userService.unBanned(isBanned, id);
   }
   //*************************************************************************************
   @ApiBearerAuth()

@@ -163,6 +163,7 @@ export class UserService extends PrismaClient implements OnModuleInit {
     return { message: 'User has been banned' };
   }
 
+  //****************************************************************************************************
   async fullyRemove(id: string) {
     const userDb = await this.findOne(id);
     if (!userDb) {
@@ -170,5 +171,16 @@ export class UserService extends PrismaClient implements OnModuleInit {
     }
     await this.user.delete({ where: { id } });
     return { message: 'Your account has been deleted correctly' };
+  }
+
+  //****************************************************************************************************
+
+  async unBanned(isBanned: boolean, id: string) {
+    const userDb = await this.findOne(id);
+    if (!userDb) {
+      throw new BadRequestException('User does not exist');
+    }
+    await this.user.update({ where: { id }, data: { isBanned: isBanned } });
+    return { message: 'User has been unbanned correctly' };
   }
 }

@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   Logger,
   OnModuleInit,
@@ -42,10 +43,12 @@ export class AuthService extends PrismaClient implements OnModuleInit {
       sub: dbUser.id,
       id: dbUser.id,
       email: dbUser.email,
+      status:dbUser.isBanned,
       roles: dbUser.role,
-      status:dbUser.isBanned
     };
-
+    if(dbUser.isBanned === true){
+      throw new ForbiddenException("You are banned please get in touch with us through the admin email consolelearncomp@gmail.com")
+    }
     const token = this.jwtService.sign(userPayload, { secret: envs.jwtSecret });
     return { message: `welcome in ${dbUser.name}`, token, user: dbUser };
   }

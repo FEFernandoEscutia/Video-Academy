@@ -1,4 +1,13 @@
-import { Controller, Post, Body, UseInterceptors, Req, Get, Res, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseInterceptors,
+  Req,
+  Get,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -33,7 +42,8 @@ export class AuthController {
 
   @ApiOperation({
     summary: 'Handle Google authentication callback',
-    description: 'Receives the callback from Google after user authentication, then redirects to the frontend with a JWT token.',
+    description:
+      'Receives the callback from Google after user authentication, then redirects to the frontend with a JWT token.',
   })
   @ApiResponse({
     status: 302,
@@ -50,11 +60,11 @@ export class AuthController {
   })
   @UseGuards(GoogleAuthGuard)
   @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
   async googleCallback(@Req() req, @Res() res) {
-    console.log(req.user);
     const response = await this.authService.signGoogle(req.user.id);
-     console.log(response.token);
-    res.redirect(`http://localhost:3000/google-callback?token=${response.token}`);
+    res.redirect(
+      `https://video-academy.onrender.com/api?token=${response.token}`,
+    );
   }
-  
 }

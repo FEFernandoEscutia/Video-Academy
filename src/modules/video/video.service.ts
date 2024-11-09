@@ -63,19 +63,8 @@ export class VideoService extends PrismaClient implements OnModuleInit {
     return { message: 'Video created and added successfully' };
   }
 
-  async findAll() {
-    return this.video.findMany();
-  }
-
   async findOne(id: string) {
     return await this.video.findMany({ where: { courseId: id } });
-  }
-
-  update(id: string, updateVideoDto: UpdateVideoDto) {
-    return this.video.update({
-      where: { id },
-      data: updateVideoDto,
-    });
   }
 
   async remove(id: string) {
@@ -92,4 +81,6 @@ export class VideoService extends PrismaClient implements OnModuleInit {
     });
     return { message: 'Video deleted correctly' };
   }
+
+
 }

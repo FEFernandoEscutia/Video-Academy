@@ -63,8 +63,7 @@ export class AuthController {
   @UseGuards(AuthGuard('google'))
   async googleCallback(@Req() req, @Res() res) {
     const response = await this.authService.signGoogle(req.user.id);
-    res.redirect(
-      `https://video-academy.onrender.com/api?token=${response.token}`,
-    );
+    // url
+    res.redirect(`https://localhost:3000/?token=${response.token}`);
   }
 }

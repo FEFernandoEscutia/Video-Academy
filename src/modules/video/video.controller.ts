@@ -60,9 +60,6 @@ export class VideoController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Retrieve a video by ID' })
-  @ApiResponse({ status: 200, description: 'Video successfully retrieved.' })
-  @ApiResponse({ status: 404, description: 'Video not found.' })
   findOne(@Param('id') id: string) {
     return this.videoService.findOne(id);
   }

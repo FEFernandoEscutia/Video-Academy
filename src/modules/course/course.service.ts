@@ -207,30 +207,6 @@ export class CourseService extends PrismaClient implements OnModuleInit {
     return await this.course.findMany({ orderBy: {} });
   }
 
-  // async filterCourse(filterDto: CourseFilterDto) {
-  //   const { technologies, priceMin, priceMax } = filterDto;
-  //   const where: any = { isAvailable: true };
-
-  //   if (technologies && technologies.length > 0) {
-  //     where.technologies = { hasSome: technologies };
-  //   }
-
-  //   if (priceMin !== undefined || priceMax !== undefined) {
-  //     where.price = {};
-  //     where.price.gte = priceMin; // gte valores mayor o igual
-  //     where.price.lte = priceMax; // lte  valores menor o igual
-  //   }
-
-  //   try {
-  //     return await this.course.findMany({
-  //       where,
-  //     });
-  //   } catch (error) {
-  //     console.error('Error al obtener cursos:', error);
-  //     throw new Error('No se pudieron obtener los cursos');
-  //   }
-  // }
-
   async findOne(id: string): Promise<CreateCourseDto> {
     return await this.course.findFirst({
       where: {

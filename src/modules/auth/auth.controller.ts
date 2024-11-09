@@ -53,8 +53,8 @@ export class AuthController {
   async googleCallback(@Req() req, @Res() res) {
     console.log(req.user);
     const response = await this.authService.signGoogle(req.user.id);
-     
-    res.redirect(`http://localhost:3000/?token=${response.token}`);
+     console.log(response.token);
+    res.redirect(`http://localhost:3000/google-callback?token=${response.token}`);
   }
   
 }

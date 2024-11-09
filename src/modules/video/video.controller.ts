@@ -81,8 +81,8 @@ export class VideoController {
   @ApiOperation({ summary: 'Delete a video by ID' })
   @ApiResponse({ status: 200, description: 'Video successfully deleted.' })
   @ApiResponse({ status: 404, description: 'Video not found.' })
-  //@UseGuards(AuthGuard, RolesGuard)
-  //@Roles(Role.ADMIN)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   remove(@Param('id') id: string) {
     return this.videoService.remove(id);
   }

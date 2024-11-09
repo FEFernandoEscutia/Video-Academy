@@ -13,7 +13,7 @@ import googleOAuthConfig from 'src/config/google-oauth.config';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [googleOAuthConfig], // Cargar la configuración de Google
+      load: [googleOAuthConfig],
     }),
     PassportModule,
     JwtModule.register({

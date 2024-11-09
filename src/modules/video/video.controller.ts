@@ -10,6 +10,7 @@ import {
   UploadedFile,
   UseGuards,
   Put,
+  Req,
   //UseGuards,
 } from '@nestjs/common';
 import { VideoService } from './video.service';
@@ -45,7 +46,7 @@ export class VideoController {
   @Roles(Role.ADMIN)
   create(
     @Body() createVideoDto: CreateVideoDto,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile('video') file: Express.Multer.File,
     @Param('id') id: string,
   ) {
     return this.videoService.create(createVideoDto, file, id);
@@ -55,6 +56,20 @@ export class VideoController {
   @UseGuards(AuthGuard)
   findOne(@Param('id') id: string) {
     return this.videoService.findOne(id);
+  }
+
+  @Patch(':id')
+  @UseInterceptors(FileInterceptor('video'))
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  update(
+    @Param('id') id: string,
+    @Body() updateVideoDto: UpdateVideoDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+
+    
+   return this.videoService.update(id, updateVideoDto, file);
   }
 
   @Delete(':id')

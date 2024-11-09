@@ -68,7 +68,7 @@ export class VideoService extends PrismaClient implements OnModuleInit {
   }
 
   async findOne(id: string) {
-    return this.video.findUnique({ where: { id } });
+    return await this.video.findMany({ where: { courseId: id } });
   }
 
   update(id: string, updateVideoDto: UpdateVideoDto) {
@@ -79,11 +79,13 @@ export class VideoService extends PrismaClient implements OnModuleInit {
   }
 
   async remove(id: string) {
-    const dbVideo = await this.video.findFirst({where:{
-      id
-    }})
-    if(!dbVideo){
-      throw new BadRequestException("video does not exist")
+    const dbVideo = await this.video.findFirst({
+      where: {
+        id,
+      },
+    });
+    if (!dbVideo) {
+      throw new BadRequestException('video does not exist');
     }
     await this.video.delete({
       where: { id },

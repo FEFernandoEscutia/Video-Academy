@@ -5,13 +5,13 @@ import {
   Logger,
   NotFoundException,
   OnModuleInit,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { Course, PrismaClient } from '@prisma/client';
 import { CourseFilterDto } from './dto/filter-course.dto';
 import { UploadApiResponse, v2 } from 'cloudinary';
-import { Multer } from 'multer';
 const toStream = require('buffer-to-stream');
 @Injectable()
 export class CourseService extends PrismaClient implements OnModuleInit {
@@ -20,6 +20,20 @@ export class CourseService extends PrismaClient implements OnModuleInit {
   async onModuleInit() {
     this.$connect();
     this.logger.log('Database Connected');
+  }
+
+  async findMyFavCourses(id: string) {
+    const dbUser = await this.user.findMany({
+      where: { id },
+      include: {
+        favorites: true,
+      },
+    });
+    const favCourses = dbUser.flatMap((user) => user.favorites);
+    if (favCourses.length === 0) {
+      throw new NotFoundException('No favorite courses found');
+    }
+    return favCourses;
   }
 
   //******************************
@@ -302,5 +316,56 @@ export class CourseService extends PrismaClient implements OnModuleInit {
     });
 
     return `The course with ID ${id} has been successfully deleted.`;
+  }
+
+  async addFav(id: string, userId: string, toggle: boolean) {
+    const course = await this.course.findFirst({ where: { id } });
+
+    if (!course) {
+      throw new NotFoundException('Course not found');
+    }
+    const dbUser = await this.user.findFirst({
+      where: { id: userId },
+      include: {
+        courses: true,
+        favorites: true,
+      },
+    });
+    const isCourseOwnedByUser = dbUser.courses.some(
+      (userCourse) => userCourse.id === course.id,
+    );
+    if (!isCourseOwnedByUser) {
+      throw new UnauthorizedException('User has not purchased the course yet');
+    }
+    const isCourseStaredByUser = dbUser.favorites.some(
+      (favCourse) => favCourse.id === course.id,
+    );
+    if (toggle === true) {
+      if (isCourseStaredByUser) {
+        throw new UnauthorizedException(
+          'You already have this course added to your favorites',
+        );
+      }
+      return await this.user.update({
+        where: { id: userId },
+        data: {
+          favorites: {
+            connect: { id: course.id },
+          },
+        },
+      });
+    } else {
+      if (!isCourseStaredByUser) {
+        throw new UnauthorizedException('This course is not in your favorites');
+      }
+      return await this.user.update({
+        where: { id: userId },
+        data: {
+          favorites: {
+            disconnect: { id: course.id },
+          },
+        },
+      });
+    }
   }
 }

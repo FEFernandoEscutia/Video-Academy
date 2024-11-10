@@ -18,6 +18,7 @@ import {
   FileTypeValidator,
   BadRequestException,
   Put,
+  ForbiddenException,
 } from '@nestjs/common';
 import { CourseService } from './course.service';
 import { CreateCourseDto } from './dto/create-course.dto';
@@ -154,6 +155,18 @@ export class CourseController {
     const loggedUser = req.user;
     return this.courseService.findMyCourses(loggedUser.id);
   }
+
+//**********************************FIND FAVS COURSES **********************************************
+  @Get('favorite-courses')
+  @ApiOperation({
+    summary: 'Get user’s purchased courses',
+    description: `Retrieves all courses bought by the logged-in user. Authentication required.`,
+  })
+  @UseGuards(AuthGuard)
+  async findMyFavCourses(@Req() req: any) {
+    const loggedUser = req.user;
+    return this.courseService.findMyFavCourses(loggedUser.id);
+  }
   //***************************************** search filter by title ***********************************************************
 
   @ApiOperation({
@@ -234,6 +247,22 @@ export class CourseController {
     return this.courseService.update(id, updateCourseDto, file);
   }
 
+  @Post('favorite/:id')
+  @UseGuards(AuthGuard)
+  @UseInterceptors(FileInterceptor('image'))
+  async addFav(
+    @Param('id') id: string,
+    @Req() req: any,
+    @Body('toggle') toggle: boolean,
+  ) {
+    const loggedUser = req.user;
+    if (!loggedUser) {
+      throw new ForbiddenException('Please log in');
+    }
+    
+    return this.courseService.addFav(id, loggedUser.id, toggle);
+  }
+
   //************************************  delete course ********************************* */
 
   @ApiOperation({
@@ -264,5 +293,4 @@ export class CourseController {
 
     return courseById;
   }
-
 }

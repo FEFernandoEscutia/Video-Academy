@@ -53,32 +53,50 @@ export class AuthService extends PrismaClient implements OnModuleInit {
     return { message: `welcome in ${dbUser.name}`, token, user: dbUser };
   }
 
-  async signGoogle(authDto: AuthDto) {
-    const dbUser = await this.user.findFirst({
-      where: { email: authDto.email },
+  //**************************** GOOGLE SIGNIN************************************* */
+
+  async signGoogle(userId: string) {
+    // Busca al usuario en la base de datos utilizando el userId
+    const dbUser = await this.user.findUnique({
+      where: { id: userId },
     });
   
+  
     if (!dbUser) {
-      throw new BadRequestException('Invalid username or password');
+      throw new BadRequestException('User not found');
     }
   
-    if (authDto.password && !await bcrypt.compare(authDto.password, dbUser.password)) {
-      throw new BadRequestException('Invalid username or password');
+   
+    if (dbUser.isBanned) {
+      throw new ForbiddenException("You are banned. Please contact the admin.");
     }
   
+    
     const userPayload = {
       sub: dbUser.id,
       id: dbUser.id,
       email: dbUser.email,
+      status: dbUser.isBanned,
       roles: dbUser.role,
     };
+
+    try {
+     
+      const token = this.jwtService.sign(userPayload, { secret: process.env.JWT_SECRET });
   
-    const token = this.jwtService.sign(userPayload, { secret: envs.jwtSecret });
-    return { message: `Welcome, ${dbUser.name}`, token, user: dbUser };
+      console.log('Token generated successfully:', token); 
+  
+      return { message: `Welcome ${dbUser.name}`, token, user: dbUser };
+    } catch (error) {
+      console.error('Error signing token:', error);
+      throw new BadRequestException('Error generating token');
+    }
   }
   
   
-  //**************************************** AUTH GOOGLE ************************************************************
+  
+  
+  //**************************************** VALIDATE PROFILE AUTH GOOGLE ************************************************************
   async validateGoogleUser(profileData: any): Promise<any> {
 
     const DEFAULT_IMAGE_URL = 'https://img.freepik.com/vector-premium/icono-perfil-avatar-predeterminado-imagen-usuario-redes-sociales-icono-avatar-gris-silueta-perfil-blanco-ilustracion-vectorial_561158-3407.jpg?w=740';

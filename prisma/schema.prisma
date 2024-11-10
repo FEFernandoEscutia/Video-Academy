@@ -23,12 +23,12 @@ model User {
 }
 
 model Video {
-  id          String @id @default(uuid())
+  id          String  @id @default(uuid())
   title       String
   description String
   url         String
   courseId    String
-  course      Course @relation(fields: [courseId], references: [id])
+  course      Course  @relation(fields: [courseId], references: [id])
 }
 
 model Course {

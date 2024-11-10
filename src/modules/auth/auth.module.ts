@@ -11,10 +11,7 @@ import googleOAuthConfig from 'src/config/google-oauth.config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      load: [googleOAuthConfig],
-    }),
+    ConfigModule.forFeature(googleOAuthConfig),
     PassportModule,
     JwtModule.register({
       secret: envs.jwtSecret,

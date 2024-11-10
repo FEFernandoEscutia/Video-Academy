@@ -58,12 +58,17 @@ export class AuthController {
       },
     },
   })
-  @UseGuards(GoogleAuthGuard)
+  
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   async googleCallback(@Req() req, @Res() res) {
+  
     const response = await this.authService.signGoogle(req.user.id);
-    // url
-    res.redirect(`https://localhost:3000/?token=${response.token}`);
+
+    // const frontendUrl = 'https://conso-learn.vercel.app/';
+
+    const frontendUrl = 'http://localhost:3000';
+
+    return res.redirect(`${frontendUrl}/?token=${response.token}`);
   }
 }

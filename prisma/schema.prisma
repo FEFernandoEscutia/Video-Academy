@@ -17,6 +17,7 @@ model User {
   role     Role     @default(USER)
   phone    String   @unique
   isBanned Boolean  @default(false)
+  favorites Course[]  @relation("FavoriteCourses")
   orders   Order[]
   reviews  Review[]
   courses  Course[] @relation("PurchasedCourses")
@@ -42,6 +43,7 @@ model Course {
   isfree       Boolean  @default(false)
   rating       Float    @default(5)
   Orders       Order[]
+  favoritedBy  User[]   @relation("FavoriteCourses")
   reviews      Review[]
   videos       Video[]
   users        User[]   @relation("PurchasedCourses")

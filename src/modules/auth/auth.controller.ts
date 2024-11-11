@@ -14,11 +14,15 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthInterceptor } from 'src/interceptors/auth.interceptor';
 import { GoogleAuthGuard } from 'src/guards/google.oauth.guard';
 import { AuthGuard } from '@nestjs/passport';
+import { UserService } from '../user/user.service';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UserService,
+  ) {}
 
   @Post()
   @ApiOperation({
@@ -32,53 +36,18 @@ export class AuthController {
 
   //*************************** auth Google ************************** */
 
-  @ApiResponse({
-    status: 302,
-    description: 'Redirects to Google for authentication',
-  })
-  @Get('google/login')
+  @Get('google')
   @UseGuards(AuthGuard('google'))
-  googleLogin() {}
+  async googleAuth(@Req() req: any) {
+  }
 
-  @ApiOperation({
-    summary: 'Handle Google authentication callback',
-    description:
-      'Receives the callback from Google after user authentication, then redirects to the frontend with a JWT token.',
-  })
-  @ApiResponse({
-    status: 302,
-    description: 'Redirects to the frontend with JWT token in the URL',
-    headers: {
-      Location: {
-        description: 'URL with JWT token parameter',
-        schema: {
-          type: 'string',
-          example: 'http://localhost:3000?token=your-jwt-token',
-        },
-      },
-    },
-  })
-  
-  @Get('google/callback')
+  @Get('google/callback1')
   @UseGuards(AuthGuard('google'))
-  async googleCallback(@Req() req, @Res() res) {
-  
-    const response = await this.authService.signGoogle(req.user.id);
-
-    // const frontendUrl = 'https://conso-learn.vercel.app/';
-
-    //  const frontendUrl = 'https://video-academy.onrender.com/api'
-
-    // const frontendUrl = 'http://localhost:3000';
-  return res.json({
-    message: 'Successfully logged in',
-    token: response.token,
-    user: {
-      id: req.user.id,
-      email: req.user.email,
-      name: req.user.name,
-    },
-  });
-}
-
+  async googleAuthRedirect(@Req() req: any) {
+    await this.userService.upsertGoogleUser(req.user);
+    const loggedUserEmail = await this.userService.findOneWEmail(
+      req.user.email,
+    );
+    return this.authService.signWithGoogle(loggedUserEmail.id);
+  }
 }

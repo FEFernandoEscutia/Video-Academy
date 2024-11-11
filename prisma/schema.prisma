@@ -11,11 +11,11 @@ datasource db {
 model User {
   id       String   @id @default(uuid())
   email    String   @unique
-  password String
+  password String?
   name     String
   image    String?  @default("https://img.freepik.com/vector-premium/icono-perfil-avatar-predeterminado-imagen-usuario-redes-sociales-icono-avatar-gris-silueta-perfil-blanco-ilustracion-vectorial_561158-3407.jpg?w=740")
   role     Role     @default(USER)
-  phone    String   @unique
+  phone    String?   @unique
   isBanned Boolean  @default(false)
   favorites Course[]  @relation("FavoriteCourses")
   orders   Order[]

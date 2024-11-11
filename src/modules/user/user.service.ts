@@ -73,6 +73,28 @@ export class UserService extends PrismaClient implements OnModuleInit {
     });
   }
 
+  async upsertGoogleUser(user: {
+    email: string;
+    firstName: string;
+    picture: string;
+    accessToken: string;
+  }) {
+    return await this.user.upsert({
+      where: { email: user.email },
+      update: {
+        name: user.firstName,
+        image: user.picture,
+      },
+      create: {
+        email: user.email,
+        name: user.firstName,
+        role: Role.USER,
+        image: user.picture,
+        isBanned: false,
+      },
+    });
+  }
+
   //****************************************************************************************************
 
   async findAll(paginationDto: PaginationDto) {

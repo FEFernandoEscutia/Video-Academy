@@ -67,8 +67,18 @@ export class AuthController {
 
     // const frontendUrl = 'https://conso-learn.vercel.app/';
 
-    const frontendUrl = 'http://localhost:3000';
+    //  const frontendUrl = 'https://video-academy.onrender.com/api'
 
-    return res.redirect(`${frontendUrl}/?token=${response.token}`);
-  }
+    // const frontendUrl = 'http://localhost:3000';
+  return res.json({
+    message: 'Successfully logged in',
+    token: response.token,
+    user: {
+      id: req.user.id,
+      email: req.user.email,
+      name: req.user.name,
+    },
+  });
+}
+
 }

@@ -37,21 +37,37 @@ export class AuthController {
 
   //*************************** auth Google ************************** */
 
-
+  @Get('google')
   @UseGuards(AuthGuard('google'))
   async googleAuth(@Req() req: any) {
   }
 
+  // @Get('google/callback1')
+  // @UseGuards(AuthGuard('google'))
+  // async googleAuthRedirect(@Req() req: any) {
+  //   await this.userService.upsertGoogleUser(req.user);
+  //   const loggedUserEmail = await this.userService.findOneWEmail(
+  //     req.user.email,
+  //   );
+  //   return this.authService.signWithGoogle(loggedUserEmail.id);
+  // }
+
   @Get('google/callback1')
   @UseGuards(AuthGuard('google'))
-  async googleAuthRedirect(@Req() req: any) {
-    await this.userService.upsertGoogleUser(req.user);
-    const loggedUserEmail = await this.userService.findOneWEmail(
-      req.user.email,
-    );
-    console.log("checking");
-    
-    return this.authService.signWithGoogle(loggedUserEmail.id);
+  async googleAuthRedirect(@Req() req: any, @Res() res: any) {
+    try {
+      await this.userService.upsertGoogleUser(req.user);
+      const loggedUserEmail = await this.userService.findOneWEmail(
+        req.user.email,
+      );
+  
+      const token = this.authService.signWithGoogle(loggedUserEmail.id);
+  
+      return res.redirect(`https://conso-learn.vercel.app?token=${token}`);
+    } catch (error) {
+      console.error("Error Auth:", error);
+      return res.redirect('https://conso-learn.vercel.app/error');
+    }
   }
 
 

@@ -33,7 +33,7 @@ export class CourseService extends PrismaClient implements OnModuleInit {
     if (favCourses.length === 0) {
       throw new NotFoundException('No favorite courses found');
     }
-    return { favCoursesData:favCourses};
+    return { favCoursesData: favCourses };
   }
 
   //******************************
@@ -331,12 +331,6 @@ export class CourseService extends PrismaClient implements OnModuleInit {
         favorites: true,
       },
     });
-    const isCourseOwnedByUser = dbUser.courses.some(
-      (userCourse) => userCourse.id === course.id,
-    );
-    if (!isCourseOwnedByUser) {
-      throw new UnauthorizedException('User has not purchased the course yet');
-    }
     const isCourseStaredByUser = dbUser.favorites.some(
       (favCourse) => favCourse.id === course.id,
     );

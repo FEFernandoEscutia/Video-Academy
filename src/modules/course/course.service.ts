@@ -33,7 +33,7 @@ export class CourseService extends PrismaClient implements OnModuleInit {
     if (favCourses.length === 0) {
       throw new NotFoundException('No favorite courses found');
     }
-    return favCourses;
+    return { favCoursesData:favCourses};
   }
 
   //******************************

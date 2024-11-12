@@ -15,6 +15,7 @@ import { AuthInterceptor } from 'src/interceptors/auth.interceptor';
 import { GoogleAuthGuard } from 'src/guards/google.oauth.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { UserService } from '../user/user.service';
+import { Response } from 'express';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -38,8 +39,7 @@ export class AuthController {
 
   @Get('google')
   @UseGuards(AuthGuard('google'))
-  async googleAuth(@Req() req: any) {
-  }
+  async googleAuth(@Req() req: any) {}
 
   @Get('google/callback1')
   @UseGuards(AuthGuard('google'))
@@ -49,5 +49,12 @@ export class AuthController {
       req.user.email,
     );
     return this.authService.signWithGoogle(loggedUserEmail.id);
+  }
+
+  @Get('logout')
+  async logout(@Req() req: any, @Res() res: Response) {
+    res.clearCookie('jwt', { path: '/' });
+
+    return res.status(200).json({ message: 'logged out correctly ' });
   }
 }

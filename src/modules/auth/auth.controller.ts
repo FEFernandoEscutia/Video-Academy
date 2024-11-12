@@ -37,9 +37,10 @@ export class AuthController {
 
   //*************************** auth Google ************************** */
 
-  @Get('google')
+
   @UseGuards(AuthGuard('google'))
-  async googleAuth(@Req() req: any) {}
+  async googleAuth(@Req() req: any) {
+  }
 
   @Get('google/callback1')
   @UseGuards(AuthGuard('google'))
@@ -48,12 +49,16 @@ export class AuthController {
     const loggedUserEmail = await this.userService.findOneWEmail(
       req.user.email,
     );
+    console.log("checking");
+    
     return this.authService.signWithGoogle(loggedUserEmail.id);
   }
+
 
   @Get('logout')
   async logout(@Req() req: any, @Res() res: Response) {
     res.clearCookie('jwt', { path: '/' });
+    
 
     return res.status(200).json({ message: 'logged out correctly ' });
   }

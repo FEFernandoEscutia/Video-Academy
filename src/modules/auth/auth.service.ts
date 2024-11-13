@@ -25,6 +25,9 @@ export class AuthService extends PrismaClient implements OnModuleInit {
   async signIn(authDto: AuthDto) {
     const dbUser = await this.user.findFirst({
       where: { email: authDto.email },
+      include: {
+        favorites: true,
+      },
     });
 
     if (!dbUser) {
@@ -53,7 +56,6 @@ export class AuthService extends PrismaClient implements OnModuleInit {
     return { message: `welcome in ${dbUser.name}`, token, user: dbUser };
   }
 
-
   //**************************** GOOGLE SIGNIN************************************* */
 
   async signWithGoogle(userId: string) {
@@ -81,7 +83,6 @@ export class AuthService extends PrismaClient implements OnModuleInit {
       const token = this.jwtService.sign(userPayload, {
         secret: process.env.JWT_SECRET,
       });
-
 
       return { message: `Welcome ${dbUser.name}`, token, user: dbUser };
     } catch (error) {

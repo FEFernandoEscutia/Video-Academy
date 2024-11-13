@@ -39,43 +39,24 @@ export class AuthController {
 
   @Get('google')
   @UseGuards(AuthGuard('google'))
-  async googleAuth(@Req() req: any) {
-  }
-
-  // @Get('google/callback1')
-  // @UseGuards(AuthGuard('google'))
-  // async googleAuthRedirect(@Req() req: any) {
-  //   await this.userService.upsertGoogleUser(req.user);
-  //   const loggedUserEmail = await this.userService.findOneWEmail(
-  //     req.user.email,
-  //   );
-  //   return this.authService.signWithGoogle(loggedUserEmail.id);
-  // }
+  async googleAuth(@Req() req: any) {}
 
   @Get('google/callback1')
   @UseGuards(AuthGuard('google'))
-  async googleAuthRedirect(@Req() req: any, @Res() res: any) {
-    try {
-      await this.userService.upsertGoogleUser(req.user);
-      const loggedUserEmail = await this.userService.findOneWEmail(
-        req.user.email,
-      );
-  
-      const token = this.authService.signWithGoogle(loggedUserEmail.id);
-  
-      return res.redirect(`https://conso-learn.vercel.app?token=${token}`);
-    } catch (error) {
-      console.error("Error Auth:", error);
-      return res.redirect('https://conso-learn.vercel.app/error');
-    }
+  async googleAuthRedirect(@Req() req: any) {
+    await this.userService.upsertGoogleUser(req.user);
+    const loggedUserEmail = await this.userService.findOneWEmail(
+      req.user.email,
+    );
+    return this.authService.signWithGoogle(loggedUserEmail.id);
   }
-
 
   @Get('logout')
   async logout(@Req() req: any, @Res() res: Response) {
     res.clearCookie('jwt', { path: '/' });
-    
 
     return res.status(200).json({ message: 'logged out correctly ' });
   }
+
+
 }

@@ -50,8 +50,7 @@ export class CourseController {
 
   @ApiOperation({
     summary: 'Create a new course',
-    description:
-      'This endpoint allows only Admins to create a new course. Authentication is required.',
+    description: 'This endpoint allows only Admins to create a new course. Authentication is required.',
   })
   @ApiResponse({ status: 201, description: 'Course created successfully.' })
   @ApiResponse({
@@ -64,13 +63,26 @@ export class CourseController {
   @UseInterceptors(FileInterceptor('image'))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
+    description: 'Course creation payload with an optional image file',
     schema: {
       type: 'object',
       properties: {
-        image: {
-          type: 'string',
-          format: 'binary',
-          description: 'Image file to upload (jpg, jpeg, png, or webp)',
+        title: { type: 'string', example: 'JavaScript Programming Course', minLength: 5, maxLength: 100 },
+        description: { 
+          type: 'string', 
+          example: 'This course covers the basics of JavaScript, including functions, arrays, and objects.', 
+          minLength: 20, 
+          maxLength: 1000 
+        },
+        price: { type: 'number', example: 49.99, minimum: 0, maximum: 10000 },
+        thumbnail: { 
+          type: 'string', 
+          example: 'https://example.com/thumbnail.jpg', 
+          description: 'Thumbnail URL for the course' 
+        },
+        image: { 
+          type: 'file', 
+          description: 'Optional image file to upload (jpg, jpeg, png, or webp)' 
         },
       },
     },
@@ -137,6 +149,7 @@ export class CourseController {
     status: 403,
     description: 'Forbidden. Only Admins can access this data.',
   })
+  @ApiQuery({ type: CourseFilterDto })  
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   async findAllCourseAdmin(@Query() filterDto: CourseFilterDto) {
@@ -247,21 +260,51 @@ export class CourseController {
     return this.courseService.update(id, updateCourseDto, file);
   }
 
-  @Post('favorite/:id')
-  @UseGuards(AuthGuard)
-  @UseInterceptors(FileInterceptor('image'))
-  async addFav(
-    @Param('id') id: string,
-    @Req() req: any,
-    @Body('toggle') toggle: boolean,
-  ) {
-    const loggedUser = req.user;
-    if (!loggedUser) {
-      throw new ForbiddenException('Please log in');
-    }
-    
-    return this.courseService.addFav(id, loggedUser.id, toggle);
+@Post('favorite/:id')
+@ApiOperation({
+  summary: 'Toggle favorite status for a course',
+  description: 'Allows a logged-in user to add or remove a course from their list of favorites based on the toggle value.',
+})
+@ApiParam({
+  name: 'id',
+  type: String,
+  description: 'Unique identifier of the course to be favorited or unfavorited',
+})
+@ApiBody({
+  schema: {
+    type: 'object',
+    properties: {
+      toggle: {
+        type: 'boolean',
+        description: 'Set to true to add the course to favorites, false to remove it',
+      },
+    },
+    required: ['toggle'],
+  },
+})
+@ApiResponse({
+  status: 200,
+  description: 'Favorite status updated successfully.',
+})
+@ApiResponse({
+  status: 403,
+  description: 'Forbidden. User must be logged in to toggle favorites.',
+})
+@UseGuards(AuthGuard)
+@UseInterceptors(FileInterceptor('image'))
+async addFav(
+  @Param('id') id: string,
+  @Req() req: any,
+  @Body('toggle') toggle: boolean,
+) {
+  const loggedUser = req.user;
+  if (!loggedUser) {
+    throw new ForbiddenException('Please log in');
   }
+
+  return this.courseService.addFav(id, loggedUser.id, toggle);
+}
+
 
   //************************************  delete course ********************************* */
 

@@ -8,6 +8,7 @@ import {
   MaxLength,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 
 export class UpdateCourseDto extends PartialType(CreateCourseDto) {
@@ -15,6 +16,11 @@ export class UpdateCourseDto extends PartialType(CreateCourseDto) {
   @MaxLength(100, { message: 'Title cannot exceed 100 characters.' })
   title?: string;
 
+  @ApiPropertyOptional({
+    description: 'Indicates if the course is available',
+    type: Boolean,
+    example: true,
+  })
   @IsBoolean()
   @IsOptional()
   @Transform(({ value }) =>

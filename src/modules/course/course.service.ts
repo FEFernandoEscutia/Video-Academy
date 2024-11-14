@@ -42,6 +42,14 @@ export class CourseService extends PrismaClient implements OnModuleInit {
     createCourseDto: CreateCourseDto,
     file: Express.Multer.File,
   ) {
+    const dbCourse = this.course.findFirst({
+      where: { title: createCourseDto.title },
+    });
+    if (dbCourse) {
+      return new BadRequestException(
+        'there is a course with the same name created already',
+      );
+    }
     const { thumbnail, ...data } = createCourseDto;
     new Promise((resolve, reject) => {
       const upload = v2.uploader.upload_stream(

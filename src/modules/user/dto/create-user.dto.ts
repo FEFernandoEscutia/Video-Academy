@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import {
   IsEmail,
@@ -45,6 +45,12 @@ export class CreateUserDto {
   @IsPhoneNumber()
   phone: string;
 
+  @ApiPropertyOptional({
+    description: 'Role of the user',
+    enum: Role,
+    default: Role.USER,
+    example: Role.USER,
+  })
   @IsOptional()
   role?: Role;
 }

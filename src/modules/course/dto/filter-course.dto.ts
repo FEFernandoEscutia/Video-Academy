@@ -28,11 +28,21 @@ export class CourseFilterDto {
   })
   priceSelector?: BooleanString;
 
+  @ApiPropertyOptional({
+    description: 'Indicates if the course is free (true for free, false for paid)',
+    type: Boolean,
+    example: true,
+  })
   @IsOptional()
   @IsBoolean()
   @Transform(({ value }) => value === 'true' || value === true)
   isfree?: boolean;
 
+  @ApiPropertyOptional({
+    description: 'Sorting criteria for courses',
+    enum: ['users', 'reviews', 'rating'],
+    example: 'users',
+  })
   @IsOptional()
   @IsString()
   sortBy?: 'users' | 'reviews' | 'rating';

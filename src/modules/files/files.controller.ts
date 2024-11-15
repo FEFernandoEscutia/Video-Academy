@@ -17,7 +17,7 @@ import { RolesGuard } from 'src/guards/roles.guard';
 import { Roles } from 'src/decorators/role.decorator';
 import { Role } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/guards/auth.guard';
 @ApiTags('files')
 @Controller('files')
@@ -103,19 +103,52 @@ export class FilesController {
   }
 
   @Post('GoogleUpload')
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(@UploadedFile() file: Express.Multer.File) {
-    if (!file) {
-      throw new BadRequestException('File is required');
-    }
-
-    try {
-      const publicUrl = await this.filesService.uploadGoogleFiles(file);
-
-      return { url: publicUrl };
-    } catch (error) {
-      throw new BadRequestException('Failed to upload file');
-    }
+@ApiOperation({
+  summary: 'Upload a file to Google Cloud Storage',
+  description: 'Uploads a file to Google Cloud Storage and returns its public URL.',
+})
+@ApiBody({
+  description: 'File to be uploaded',
+  required: true,
+  schema: {
+    type: 'object',
+    properties: {
+      file: {
+        type: 'string',
+        format: 'binary',
+        description: 'File to upload',
+      },
+    },
+  },
+})
+@ApiResponse({
+  status: 200,
+  description: 'File uploaded successfully',
+  schema: {
+    type: 'object',
+    properties: {
+      url: { type: 'string', description: 'Public URL of the uploaded file' },
+    },
+  },
+})
+@ApiResponse({
+  status: 400,
+  description: 'Bad Request. File is required or upload failed.',
+})
+@UseInterceptors(FileInterceptor('file'))
+async uploadFile(@UploadedFile() file: Express.Multer.File) {
+  if (!file) {
+    throw new BadRequestException('File is required');
   }
+
+  try {
+    const publicUrl = await this.filesService.uploadGoogleFiles(file);
+
+    return { url: publicUrl };
+  } catch (error) {
+    throw new BadRequestException('Failed to upload file');
+  }
+}
+
   //
 }

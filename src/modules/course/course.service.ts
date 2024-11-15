@@ -42,7 +42,7 @@ export class CourseService extends PrismaClient implements OnModuleInit {
     createCourseDto: CreateCourseDto,
     file: Express.Multer.File,
   ) {
-    const dbCourse = this.course.findFirst({
+    const dbCourse = await  this.course.findFirst({
       where: { title: createCourseDto.title },
     });
     if (dbCourse) {

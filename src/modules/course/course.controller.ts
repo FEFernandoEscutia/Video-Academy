@@ -137,6 +137,7 @@ export class CourseController {
     status: 403,
     description: 'Forbidden. Only Admins can access this data.',
   })
+  @ApiBearerAuth()
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   async findAllCourseAdmin(@Query() filterDto: CourseFilterDto) {
@@ -150,6 +151,7 @@ export class CourseController {
     summary: 'Get user’s purchased courses',
     description: `Retrieves all courses bought by the logged-in user. Authentication required.`,
   })
+  @ApiBearerAuth()
   @UseGuards(AuthGuard)
   async findMyCourses(@Req() req: any) {
     const loggedUser = req.user;
@@ -162,6 +164,7 @@ export class CourseController {
     summary: 'Get user’s purchased courses',
     description: `Retrieves all courses bought by the logged-in user. Authentication required.`,
   })
+  @ApiBearerAuth()
   @UseGuards(AuthGuard)
   async findMyFavCourses(@Req() req: any) {
     const loggedUser = req.user;
@@ -228,6 +231,7 @@ export class CourseController {
       'This endpoint allows only Admins to update a course. Authentication is required.',
   })
   @Patch(':id')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard, RolesGuard)
   @UseInterceptors(FileInterceptor('image'))
   @Roles(Role.ADMIN)
@@ -248,6 +252,7 @@ export class CourseController {
   }
 
   @Post('favorite/:id')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('image'))
   async addFav(
@@ -282,6 +287,7 @@ export class CourseController {
   })
   @ApiResponse({ status: 404, description: 'Course not found.' })
   @Delete(':id')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   async remove(@Param('id') id: string) {

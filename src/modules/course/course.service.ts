@@ -45,15 +45,15 @@ export class CourseService extends PrismaClient implements OnModuleInit {
     const dbCourse = await this.course.findFirst({
       where: { title: createCourseDto.title },
     });
-  
+
     if (dbCourse) {
       throw new BadRequestException(
         'There is a course with the same name already created',
       );
     }
-  
+
     const { thumbnail, ...data } = createCourseDto;
-  
+
     try {
       const result: UploadApiResponse = await new Promise((resolve, reject) => {
         const upload = v2.uploader.upload_stream(
@@ -71,23 +71,24 @@ export class CourseService extends PrismaClient implements OnModuleInit {
         );
         toStream(file.buffer).pipe(upload);
       });
-  
+
       const newCourse = {
         ...data,
+        isAvailable: false,
         thumbnail: result.url,
         technologies: Array.isArray(techs) ? techs : [techs],
       };
-  
+
       await this.course.create({ data: newCourse });
-  
+
       return { message: 'Course Created Successfully' };
     } catch (error) {
       console.log(error);
-      
+
       throw new BadRequestException('Error uploading file or creating course');
     }
   }
-  
+
   //******************************
   async findAll(filterDto: CourseFilterDto): Promise<Course[]> {
     const { technologies, priceSelector, isfree } = filterDto;
@@ -100,7 +101,6 @@ export class CourseService extends PrismaClient implements OnModuleInit {
           },
         }
       : {};
-
 
     const freeFilter = isfree !== undefined ? { isfree } : {};
 
@@ -184,7 +184,6 @@ export class CourseService extends PrismaClient implements OnModuleInit {
 
     let orderByCondition;
 
-
     switch (sortBy) {
       case 'users':
         orderByCondition = [{ users: { _count: 'desc' } }];
@@ -200,7 +199,6 @@ export class CourseService extends PrismaClient implements OnModuleInit {
         break;
     }
 
-
     const topCourses = await this.course.findMany({
       where: { isAvailable: true },
       include: {
@@ -210,7 +208,6 @@ export class CourseService extends PrismaClient implements OnModuleInit {
       orderBy: orderByCondition,
     });
 
- 
     return topCourses.map((course) => ({
       id: course.id,
       title: course.title,

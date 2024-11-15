@@ -29,6 +29,12 @@ export class AuthService extends PrismaClient implements OnModuleInit {
         favorites: true,
       },
     });
+    const dbUser2 = await this.user.findFirst({
+      where: { email: authDto.email },
+      include: {
+        courses: true,
+      },
+    });
 
     if (!dbUser) {
       throw new BadRequestException('Invalid username or password');
@@ -51,6 +57,22 @@ export class AuthService extends PrismaClient implements OnModuleInit {
       throw new ForbiddenException(
         'You are banned please get in touch with us through the admin email consolelearncomp@gmail.com',
       );
+    }
+    if (dbUser.role === Role.ADMIN) {
+      const courses = await this.course.findMany({});
+      for (const course of courses) {
+        if (dbUser2.courses.some((c) => c.id === course.id)) {
+          continue;
+        }
+        await this.user.update({
+          where: { id: dbUser2.id },
+          data: {
+            courses: {
+              connect: { id: course.id },
+            },
+          },
+        });
+      }
     }
     const token = this.jwtService.sign(userPayload, { secret: envs.jwtSecret });
     return { message: `welcome in ${dbUser.name}`, token, user: dbUser };

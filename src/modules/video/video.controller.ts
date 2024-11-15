@@ -18,7 +18,10 @@ import { CreateVideoDto } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
 import {
   ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
   ApiOperation,
+  ApiParam,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -53,24 +56,65 @@ export class VideoController {
   }
 
   @Get(':id')
-  @UseGuards(AuthGuard)
-  findOne(@Param('id') id: string) {
-    return this.videoService.findOne(id);
-  }
+@ApiOperation({
+  summary: 'Retrieve video by ID',
+  description: 'Fetches a single video by its ID. User authentication is required.',
+})
+@ApiParam({
+  name: 'id',
+  type: String,
+  description: 'Unique identifier of the video to retrieve',
+})
+@ApiResponse({
+  status: 200,
+  description: 'Video retrieved successfully.',
+})
+@ApiResponse({
+  status: 404,
+  description: 'Video not found.',
+})
+@UseGuards(AuthGuard)
+findOne(@Param('id') id: string) {
+  return this.videoService.findOne(id);
+}
 
-  @Patch(':id')
-  @UseInterceptors(FileInterceptor('video'))
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
-  update(
-    @Param('id') id: string,
-    @Body() updateVideoDto: UpdateVideoDto,
-    @UploadedFile() file?: Express.Multer.File,
-  ) {
-
-    
-   return this.videoService.update(id, updateVideoDto, file);
-  }
+@Patch(':id')
+@ApiOperation({
+  summary: 'Update video by ID',
+  description: 'Updates a video by its ID. Only Admins can perform this action. Supports optional file upload for video updates.',
+})
+@ApiParam({
+  name: 'id',
+  type: String,
+  description: 'Unique identifier of the video to update',
+})
+@ApiBody({
+  type: UpdateVideoDto,
+  description: 'DTO containing the fields to update for the video',
+})
+@ApiConsumes('multipart/form-data')
+@ApiResponse({
+  status: 200,
+  description: 'Video updated successfully.',
+})
+@ApiResponse({
+  status: 403,
+  description: 'Forbidden. Only Admins are allowed to update videos.',
+})
+@ApiResponse({
+  status: 404,
+  description: 'Video not found.',
+})
+@UseInterceptors(FileInterceptor('video'))
+@UseGuards(AuthGuard, RolesGuard)
+@Roles(Role.ADMIN)
+update(
+  @Param('id') id: string,
+  @Body() updateVideoDto: UpdateVideoDto,
+  @UploadedFile() file?: Express.Multer.File,
+) {
+  return this.videoService.update(id, updateVideoDto, file);
+}
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a video by ID' })

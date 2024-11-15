@@ -42,42 +42,50 @@ export class CourseService extends PrismaClient implements OnModuleInit {
     createCourseDto: CreateCourseDto,
     file: Express.Multer.File,
   ) {
-    const dbCourse = this.course.findFirst({
+    const dbCourse = await this.course.findFirst({
       where: { title: createCourseDto.title },
     });
+  
     if (dbCourse) {
-      return new BadRequestException(
-        'there is a course with the same name created already',
+      throw new BadRequestException(
+        'There is a course with the same name already created',
       );
     }
+  
     const { thumbnail, ...data } = createCourseDto;
-    new Promise((resolve, reject) => {
-      const upload = v2.uploader.upload_stream(
-        {
-          resource_type: 'auto',
-          transformation: [{ transformation: 'Regular size' }],
-        },
-        async (error, result: UploadApiResponse) => {
-          if (error) {
-            reject(error);
-          } else {
-            const newCourse = {
-              ...data,
-              thumbnail: result.url,
-              technologies: techs,
-            };
-
-            await this.course.create({ data: newCourse });
-
-            resolve(result);
-          }
-        },
-      );
-      toStream(file.buffer).pipe(upload);
-    });
-
-    return { message: 'Course Created Successfully' };
+  
+    try {
+      const result: UploadApiResponse = await new Promise((resolve, reject) => {
+        const upload = v2.uploader.upload_stream(
+          {
+            resource_type: 'auto',
+            transformation: [{ transformation: 'Regular size' }],
+          },
+          (error, result) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(result);
+            }
+          },
+        );
+        toStream(file.buffer).pipe(upload);
+      });
+  
+      const newCourse = {
+        ...data,
+        thumbnail: result.url,
+        technologies: techs,
+      };
+  
+      await this.course.create({ data: newCourse });
+  
+      return { message: 'Course Created Successfully' };
+    } catch (error) {
+      throw new BadRequestException('Error uploading file or creating course');
+    }
   }
+  
   //******************************
   async findAll(filterDto: CourseFilterDto): Promise<Course[]> {
     const { technologies, priceSelector, isfree } = filterDto;
@@ -91,7 +99,7 @@ export class CourseService extends PrismaClient implements OnModuleInit {
         }
       : {};
 
-    // Filtro por cursos gratuitos o pagos
+
     const freeFilter = isfree !== undefined ? { isfree } : {};
 
     const priceFilter = priceSelector;
@@ -174,7 +182,7 @@ export class CourseService extends PrismaClient implements OnModuleInit {
 
     let orderByCondition;
 
-    // Determina la lógica de ordenación según el criterio recibido
+
     switch (sortBy) {
       case 'users':
         orderByCondition = [{ users: { _count: 'desc' } }];
@@ -190,7 +198,7 @@ export class CourseService extends PrismaClient implements OnModuleInit {
         break;
     }
 
-    // Busca los cursos con el criterio de ordenamiento
+
     const topCourses = await this.course.findMany({
       where: { isAvailable: true },
       include: {
@@ -200,7 +208,7 @@ export class CourseService extends PrismaClient implements OnModuleInit {
       orderBy: orderByCondition,
     });
 
-    // Mapea los resultados para incluir solo la información necesaria
+ 
     return topCourses.map((course) => ({
       id: course.id,
       title: course.title,

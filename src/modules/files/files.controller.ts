@@ -52,7 +52,7 @@ export class FilesController {
       new ParseFilePipe({
         validators: [
           new FileTypeValidator({
-            fileType: /(jpg|jpeg|webp)$/,
+            fileType: /(jpg|jpeg|webp|png)$/,
           }),
         ],
       }),
@@ -63,7 +63,7 @@ export class FilesController {
 
     return this.filesService.uploadFileUsingId(loggedUser.id, file);
   }
-  //
+  
   @Post('course/:id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.ADMIN)

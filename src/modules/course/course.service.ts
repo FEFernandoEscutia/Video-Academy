@@ -75,13 +75,15 @@ export class CourseService extends PrismaClient implements OnModuleInit {
       const newCourse = {
         ...data,
         thumbnail: result.url,
-        technologies: techs,
+        technologies: Array.isArray(techs) ? techs : [techs],
       };
   
       await this.course.create({ data: newCourse });
   
       return { message: 'Course Created Successfully' };
     } catch (error) {
+      console.log(error);
+      
       throw new BadRequestException('Error uploading file or creating course');
     }
   }

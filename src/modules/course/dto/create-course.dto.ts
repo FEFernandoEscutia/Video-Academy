@@ -62,4 +62,6 @@ export class CreateCourseDto {
   @IsOptional({ message: 'Thumbnail is optional.' })
   thumbnail?: string;
 
+  
+
 }
